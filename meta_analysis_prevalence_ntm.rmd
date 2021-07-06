@@ -1,0 +1,68 @@
+---
+title: "sr_prevalence_ntm"
+author: "MDP"
+date: "05/07/2021"
+output: 
+  html_document:
+    
+    toc: true
+    toc_depth: 3
+    theme: flatly
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+Our systematic review is a comprehensive picture of all studies and registry reports that include prevalence of _nontuberculous mycobacteria (NTM)_ in _cystic fibrosis_ population
+
+The analysis will be performed in R in a _Github_ version control repository. 
+
+### Aims
+1. Explore our data and summarize it briefly
+2. Explore publication bias and produce plots
+3. Conduct meta-analysis of selected studies and produce summary plots
+
+# Data wrangling
+
+### Required packages
+
+We use the tidyverse and dmetar with its associated packages
+
+```{r}
+# install.packages("meta")
+# devtools::install_github("MathiasHarrer/dmetar")
+require(dmetar)
+require(tidyverse)
+```
+
+### Data import and cleaning
+
+We will use the meta package to analyze our data. We will analyze the prevalence as a proportion and the incidence as a rate, data depending. 
+
+Thus, we require a dataframe with 
+- _sample size_
+- _study id_
+- _number of events_
+
+```{r}
+getwd()
+prevalence <- read_csv("D:/Git/SR_prevalence_NTM/20210705-meta_analysis.csv")  %>% 
+  mutate(mabs_infection = as.numeric(mabs_infection)) %>%
+  mutate(across(where(is.character), as_factor)) 
+```
+
+### Data exploration
+
+# Appraise publication bias
+
+# Meta analysis
+
+```{r}
+
+```
