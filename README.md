@@ -1,6 +1,6 @@
-# SR_prevalence_NTM
+# Systematic review on prevalence of NTM
 
-Repository for the data analysis of the systematic review on nontuberculous mycobacteria in cystic fibrosis, a systematic review of prevalence and incidence
+Repository for the data analysis of the systematic review on *__nontuberculous mycobacteria__* in *__cystic fibrosis__*, a systematic review of prevalence and incidence
 
 ![Forest plot](https://upload.wikimedia.org/wikipedia/commons/7/73/Forestplot01.jpg)
 
