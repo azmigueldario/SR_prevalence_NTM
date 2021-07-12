@@ -1,5 +1,5 @@
 ---
-title: "sr_prevalence_ntm"
+title: "Analysis: systematic review of nontuberculous mycobacteria prevalence in cystic fibrosis"
 author: "MDP"
 date: "05/07/2021"
 output: 
@@ -28,17 +28,30 @@ The analysis will be performed in R in a _Github_ version control repository.
 2. Explore publication bias and produce plots
 3. Conduct meta-analysis of selected studies and produce summary plots
 
+### Suggestions for analysis
+
+
+i.	Contemporary cohort, maybe including only data from 2010 and onwards
+ii.	Subgroup by high quality studies according to quality appraisal
+iii.	Control for overlap over years in registry studies with the random effects model (dependency in data)
+iv.	Subgroup of registry data vs peer-reviewed data
+v.	Also, subgroup according to dates or regions 
+
+
 # Data wrangling
 
 ### Required packages
 
-We use the tidyverse and dmetar with its associated packages
+- 1 for data wrangling 
+- `dmetar` with its associated packages for some helpful functions
+- `meta` for meta-analysis per se
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # install.packages("meta")
 # devtools::install_github("MathiasHarrer/dmetar")
 require(dmetar)
 require(tidyverse)
+require(meta)
 ```
 
 ### Data import and cleaning
@@ -50,19 +63,134 @@ Thus, we require a dataframe with
 - _study id_
 - _number of events_
 
-```{r}
+Other variables are included to perform subgroup analysis
+
+```{r, message=FALSE}
 getwd()
 prevalence <- read_csv("D:/Git/SR_prevalence_NTM/20210705-meta_analysis.csv")  %>% 
   mutate(mabs_infection = as.numeric(mabs_infection)) %>%
   mutate(across(where(is.character), as_factor)) 
+
+glimpse(prevalence)
+```
+
+The study design variable may have some weird coding lo let us unify it. 
+Also, let us create a new indicator variable for registry vs others.
+Finally, lets transform into `factor class` all character variables
+
+```{r}
+prevalence1<- prevalence %>%
+  mutate(study_design=case_when(study_design=="Cross-sectional study" ~ "cross sectional",
+                                study_design=="Registry report" ~ "registry",
+                                TRUE ~ "cohort"),
+         is_registry=case_when(study_design=="registry" ~ 1,
+                               TRUE ~ 0)) %>% 
+  mutate(across(where(is.character), as_factor))
+
+table(prevalence1$is_registry, prevalence1$study_design)
 ```
 
 ### Data exploration
+
+Let us summarize some aspects of our data. 
+
+- How many studies are registry reports? 
+- How many studies include pediatric, mixed or adult population ?  
+
+```{r}
+prevalence1 %>% 
+  count(study_design) %>% 
+  mutate(prop = prop.table(n)*100)
+
+prevalence1 %>% 
+  count(age_group) %>% 
+  mutate(prop = prop.table(n)*100)
+
+# excluding registry reports
+prevalence1 %>%
+  filter(is_registry==0) %>% 
+  count(age_group) %>% 
+  mutate(prop = prop.table(n)*100)
+```
+
+- What is the median first year of data in the studies? 
+- What is the range of years included in the studies? 
+- How many were conducted before 2010 and 2000?
+
+```{r}
+quantile(prevalence1$first_year_data, na.rm = T)
+
+# establish number of digits in printed results
+options(digits = 5)
+
+# excluding registry reports 
+prevalence1 %>% 
+  filter(is_registry==0) %>% 
+  summarize(
+    mean=mean(first_year_data, na.rm=T),
+    sd=sd(first_year_data, na.rm=T),
+    quantile= quantile(first_year_data, na.rm = T)
+  ) %>% 
+  as.data.frame() # as.dataframe() prints all decimal values, a tibble does not
+
+# create indicator variable for study data collection date and summarize it 
+prevalence1 %>% 
+  filter(is_registry==0) %>% 
+  mutate(
+    before_year=case_when(first_year_data<2000 ~ "<=2000",
+                          first_year_data<2010 ~ "<=2010",
+                          TRUE ~ ">=2010")) %>%
+  count(before_year) %>% 
+  mutate(prop=prop.table(n))
+```
+
+- What is the median sample size of the non-registry studies?
+
+```{r}
+
+```
+ 
 
 # Appraise publication bias
 
 # Meta analysis
 
-```{r}
+We will first approximate the prevalence of NTM infection in the cohort. We will use the variable `all_ntm_infection` which contains the number of events and `sample_size_cf` as the denominator. 
 
+```{r}
+prevalence %>% select(id, all_ntm_infection, sample_size_cf)
 ```
+
+We drop the studies that do not include a raw count of events
+
+```{r}
+table(prevalence$all_ntm_infection, useNA = "always")
+
+infection<- prevalence %>% 
+  filter (!is.na(all_ntm_infection)) 
+```
+
+```{r}
+m.prop <- metaprop(event = all_ntm_infection,
+                   n = sample_size_cf,
+                   studlab = id,
+                   data = infection,
+                   method = "inverse",
+                   sm = "PAS",
+                   comb.fixed = FALSE,
+                   comb.random = TRUE,
+                   hakn = TRUE,
+                   title = "NTM infection prevalence")
+
+m.prop
+```
+
+
+```{r}
+forest.meta(m.prop, 
+            sortvar = TE,
+            predict = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Author", "g", "SE"))
+```
+
