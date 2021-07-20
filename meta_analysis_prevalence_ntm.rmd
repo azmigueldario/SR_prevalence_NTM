@@ -1,7 +1,7 @@
 ---
 title: "Analysis: systematic review of nontuberculous mycobacteria prevalence in cystic fibrosis"
 author: "MDP"
-date: "05/07/2021"
+date: "19/07/2021"
 output: 
   html_document:
     
@@ -19,14 +19,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-Our systematic review is a comprehensive picture of all studies and registry reports that include prevalence of _nontuberculous mycobacteria (NTM)_ in _cystic fibrosis_ population
+Our systematic review is a comprehensive picture of all studies and registry reports that include prevalence/incidence of _nontuberculous mycobacteria (NTM)_ in _cystic fibrosis_ population
 
-The analysis will be performed in R in a _Github_ version control repository. 
+The analysis will be performed in R in a _Github_ version control repository
 
 ### Aims
 1. Explore our data and summarize it briefly
 2. Explore publication bias and produce plots
 3. Conduct meta-analysis of selected studies and produce summary plots
+4. Perform pre-specified subgroup analysis
+5. Conduct exploratory sensitivity analysis
 
 ### Suggestions for analysis
 
@@ -40,9 +42,8 @@ v.	Also, subgroup according to dates or regions
 
 # Data wrangling
 
-### Required packages
+__*Loading required packages*__
 
-- 1 for data wrangling 
 - `dmetar` with its associated packages for some helpful functions
 - `meta` for meta-analysis per se
 
@@ -52,31 +53,42 @@ v.	Also, subgroup according to dates or regions
 require(dmetar)
 require(tidyverse)
 require(meta)
+require(metafor)
 ```
 
-### Data import and cleaning
+## Data import and cleaning
 
-We will use the meta package to analyze our data. We will analyze the prevalence as a proportion and the incidence as a rate, data depending. 
 
-Thus, we require a dataframe with 
+We will analyze the prevalence as a proportion and the incidence as a rate, data depending. The data from the study cohort is saved in the working directory as a `___.csv` file. 
+
+
+To conduct meta-analysis of proportions, we require the following observations per study 
 - _sample size_
 - _study id_
 - _number of events_
 
-Other variables are included to perform subgroup analysis
+Other variables are included to perform subgroup analysis and to conduct exploratory data analysis. 
+We start by importing the dataset, changing all character variables to factors and cleaning the class of one of the variables:
+- _used_registry_ that contains the name of the registry used
+- _qa..._ contains the answers to the questions in the JBI assessment tool
+
 
 ```{r, message=FALSE}
 getwd()
-prevalence <- read_csv("D:/Git/SR_prevalence_NTM/20210705-meta_analysis.csv")  %>% 
+prevalence <- read_csv("D:/Git/SR_prevalence_NTM/20210719-data_meta_analysis_qa.csv")  %>% 
   mutate(mabs_infection = as.numeric(mabs_infection)) %>%
   mutate(across(where(is.character), as_factor)) 
+
+
+prevalence$used_registry<- fct_explicit_na(prevalence$used_registry, "no")
+table(prevalence$used_registry)
 
 glimpse(prevalence)
 ```
 
-The study design variable may have some weird coding lo let us unify it. 
-Also, let us create a new indicator variable for registry vs others.
-Finally, lets transform into `factor class` all character variables
+The study design variable may have some weird coding lo let us unify it.  
+- Also, let us create a new indicator variable for registry vs others.
+- Finally, lets transform into `factor class` all character variables
 
 ```{r}
 prevalence1<- prevalence %>%
@@ -90,7 +102,7 @@ prevalence1<- prevalence %>%
 table(prevalence1$is_registry, prevalence1$study_design)
 ```
 
-### Data exploration
+# Exploratory data analysis 
 
 Let us summarize some aspects of our data. 
 
@@ -100,7 +112,7 @@ Let us summarize some aspects of our data.
 ```{r}
 prevalence1 %>% 
   count(study_design) %>% 
-  mutate(prop = prop.table(n)*100)
+  mutate(prop = prop.table(n)*100) 
 
 prevalence1 %>% 
   count(age_group) %>% 
@@ -115,10 +127,17 @@ prevalence1 %>%
 
 - What is the median first year of data in the studies? 
 - What is the range of years included in the studies? 
-- How many were conducted before 2010 and 2000?
+
 
 ```{r}
 quantile(prevalence1$first_year_data, na.rm = T)
+
+ggplot(prevalence1, aes(y=first_year_data)) +
+  geom_boxplot() + 
+  labs(title= "First year of data in study",
+       y="") +
+  theme_classic()+
+  theme(axis.text.x = element_blank())
 
 # establish number of digits in printed results
 options(digits = 5)
@@ -133,32 +152,75 @@ prevalence1 %>%
   ) %>% 
   as.data.frame() # as.dataframe() prints all decimal values, a tibble does not
 
-# create indicator variable for study data collection date and summarize it 
 prevalence1 %>% 
   filter(is_registry==0) %>% 
+  ggplot(aes(y=first_year_data)) +
+  geom_boxplot() + 
+  labs(title= "First year of data in study",
+       subtitle = "No registry reports",
+       y="") +
+  theme_classic() +
+  theme(plot.subtitle=element_text(color="red4"),
+        axis.text.x = element_blank()) 
+
+```
+
+- How many were conducted before 2010 and 2000?
+
+```{r}
+# create indicator variable for study data collection date and summarize it 
+prevalence1<- prevalence1 %>%
   mutate(
-    before_year=case_when(first_year_data<2000 ~ "<=2000",
-                          first_year_data<2010 ~ "<=2010",
-                          TRUE ~ ">=2010")) %>%
+    before_year=case_when(first_year_data<2000 ~ "2000 or before",
+                          first_year_data<=2004 ~ "2001-2004",
+                          first_year_data<=2009 ~ "2005-2009",
+                          first_year_data<=2014 ~ "2010-2014",
+                          TRUE ~ "2015 or after")) 
+prevalence1 %>% 
+  filter(is_registry==0) %>% 
   count(before_year) %>% 
   mutate(prop=prop.table(n))
+
+prevalence1 %>% 
+  filter(is_registry==0) %>%
+  ggplot(aes(x=before_year, fill=factor(before_year)))+
+  geom_bar() +
+  labs(title= "Frequency of studies by groups of date",
+       subtitle = "No registry reports") +
+  ylab("") +
+  theme_classic()
 ```
+
 
 - What is the median sample size of the non-registry studies?
 
 ```{r}
+prevalence1 %>% 
+  filter(is_registry==0 & is.na(used_registry)) %>% 
+  summarize(
+  quantile (sample_size_cf, na.rm=T))
 
+prevalence1 %>% 
+  filter(is_registry==0 & is.na(used_registry)) %>% 
+  ggplot(aes(y=sample_size_cf, x=first_year_data)) +
+  geom_point() +
+  labs (title="Sample size according to year of data",
+       subtitle="No registry reports included",
+       x="First year of data collection",
+       y="Number of CF participants") +
+  theme(plot.subtitle = element_text(color="red4"))
+ 
 ```
  
 
-# Appraise publication bias
-
 # Meta analysis
 
-We will first approximate the prevalence of NTM infection in the cohort. We will use the variable `all_ntm_infection` which contains the number of events and `sample_size_cf` as the denominator. 
+## All studies meta-analysis
+
+We will first approximate the prevalence of NTM infection using all data. We will use the variable `all_ntm_infection` which contains the number of events and `sample_size_cf` as the denominator. 
 
 ```{r}
-prevalence %>% select(id, all_ntm_infection, sample_size_cf)
+prevalence1 %>% select(id, all_ntm_infection, sample_size_cf)
 ```
 
 We drop the studies that do not include a raw count of events
@@ -166,12 +228,12 @@ We drop the studies that do not include a raw count of events
 ```{r}
 table(prevalence$all_ntm_infection, useNA = "always")
 
-infection<- prevalence %>% 
+infection<- prevalence1 %>% 
   filter (!is.na(all_ntm_infection)) 
 ```
 
 ```{r}
-m.prop <- metaprop(event = all_ntm_infection,
+m.full <- metaprop(event = all_ntm_infection,
                    n = sample_size_cf,
                    studlab = id,
                    data = infection,
@@ -182,15 +244,126 @@ m.prop <- metaprop(event = all_ntm_infection,
                    hakn = TRUE,
                    title = "NTM infection prevalence")
 
-m.prop
+m.full
 ```
 
+Now, lets produce a forest plot for this MA, a little bit crowded
 
 ```{r}
-forest.meta(m.prop, 
+forest.meta(m.full, 
             sortvar = TE,
             predict = TRUE, 
             print.tau2 = FALSE,
             leftlabs = c("Author", "g", "SE"))
+```
+
+## Pre-specified subgroup analysis
+
+According to study design, registry or not. 
+
+```{r}
+update.meta(m.full,
+            byvar = is_registry, 
+            tau.common = F)
+# high heterogeneity in both
+
+update.meta(m.full,
+            byvar = study_design, 
+            tau.common = T)
+# reduced heterogeneity according to study design, lower in cohort studies
+
+reg1<- prevalence1 %>% 
+  filter (is_registry==1 & !is.na(all_ntm_infection))
+m.registry <- metaprop(event = all_ntm_infection,
+                   n = sample_size_cf,
+                   studlab = id,
+                   data = reg1,
+                   method = "inverse",
+                   sm = "PAS",
+                   comb.random = TRUE,
+                   hakn = TRUE,
+                   title = "NTM infection prevalence in registry studies")
+forest.meta(m.registry,
+            layout="RevMan5")
+  update.meta(m.full,
+            byvar = study_design, 
+            tau.common = T)
+
+forest.meta(s.design)
+
+
+```
+
+Now, according to the year when the first data was collected.
+
+```{r}
+update.meta(m.full,
+            byvar = before_year, 
+            tau.common = F)
+# reduced heterogeneity in one of the periods
+```
+
+According to regions now
+
+```{r}
+update.meta(m.full,
+            byvar = region, 
+            tau.common = F)
+# reduced heterogeneity in LAC and the Middle east
+```
+
+## Multilevel model
+
+The data from some of the studies (particularly registries) is not independent as the same patient may be represented in multiple years. Thus, we can try to control for this dependency by creating an additional level in the meta-analysis. 
+
+We use the `metafor` package to fit multilevel meta-analysis. 
+
+First, we need to calculate the raw proportions using the escalc function
+
+```{r}
+multi.prevalence<- escalc(data = prevalence1, xi=all_ntm_infection, ni=sample_size_cf, measure="PR")
+```
+
+
+
+```{r}
+multilv.registry <- rma.mv(yi = yi, 
+                     V = vi, 
+                     slab = id,
+                     data = multi.prevalence,
+                     random = ~ 1 | used_registry/id, 
+                     test = "t", 
+                     method = "REML") 
+
+summary(multilv.registry)
+```
+
+
+```{r}
+var.comp(multilv.registry)
+
+```
+
+
+
+
+## Publication bias
+
+For the meta-analysis of all studies
+
+```{r}
+funnel.meta(m.full,
+            xlim = c(-0.5, 2),
+            studlab = F)
+
+funnel.meta(m.full, xlim = c(-0.5, 2),
+            contour = c(0.9, 0.95, 0.99),
+            col.contour = c("gray75", "gray85", "gray95"))
+```
+
+We observe an asymmetrical plot lacking studies with a smaller proportion of NTM infection
+
+```{r}
+
 ```
 
