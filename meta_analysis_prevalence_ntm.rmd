@@ -23,22 +23,28 @@ Our systematic review is a comprehensive picture of all studies and registry rep
 
 The analysis will be performed in R in a _Github_ version control repository
 
-### Aims
+## Aims
 1. Explore our data and summarize it briefly
 2. Explore publication bias and produce plots
 3. Conduct meta-analysis of selected studies and produce summary plots
 4. Perform pre-specified subgroup analysis
 5. Conduct exploratory sensitivity analysis
 
-### Suggestions for analysis
+### Suggestions for analysis 
 
+*__July 6, 2021__*
 
-i.	Contemporary cohort, maybe including only data from 2010 and onwards
+i.	Contemporary cohort, maybe including only data from 2010 and onwards _#done_
 ii.	Subgroup by high quality studies according to quality appraisal
-iii.	Control for overlap over years in registry studies with the random effects model (dependency in data)
-iv.	Subgroup of registry data vs peer-reviewed data
-v.	Also, subgroup according to dates or regions 
+iii.	Control for overlap over years in registry studies with the random effects model (dependency in data) _#done_
+iv.	Subgroup of registry data vs peer-reviewed data _#done_
+v.	Also, subgroup according to dates or regions _#done_
 
+*__July 20, 2021__*
+
+i. Tips for discussion: implications of screening, raising prevalence?, implications of design, baseline status before modulators
+ii. Contact canada/australia registries for raw numbers of NTM cases _#done, not available_
+iii. Corroborate that the numbers in the UK and ECFS registries match 
 
 # Data wrangling
 
@@ -58,9 +64,7 @@ require(metafor)
 
 ## Data import and cleaning
 
-
 We will analyze the prevalence as a proportion and the incidence as a rate, data depending. The data from the study cohort is saved in the working directory as a `___.csv` file. 
-
 
 To conduct meta-analysis of proportions, we require the following observations per study 
 - _sample size_
@@ -71,7 +75,6 @@ Other variables are included to perform subgroup analysis and to conduct explora
 We start by importing the dataset, changing all character variables to factors and cleaning the class of one of the variables:
 - _used_registry_ that contains the name of the registry used
 - _qa..._ contains the answers to the questions in the JBI assessment tool
-
 
 ```{r, message=FALSE}
 getwd()
@@ -84,6 +87,18 @@ prevalence$used_registry<- fct_explicit_na(prevalence$used_registry, "no")
 table(prevalence$used_registry)
 
 glimpse(prevalence)
+```
+
+
+To produce more quality plots in the future, I make some modifications to separate the publication year and the name of the author. The function `stringr::str_to_title()` puts the first letter of every string to Upper case.  
+
+ 
+```{r}
+prevalence <-  prevalence %>% 
+  mutate(
+    slab=stringr::str_to_title(
+      gsub("([a-z])([0-9])", "\\1 \\2", prevalence$id))
+  )
 ```
 
 The study design variable may have some weird coding lo let us unify it.  
@@ -100,6 +115,21 @@ prevalence1<- prevalence %>%
   mutate(across(where(is.character), as_factor))
 
 table(prevalence1$is_registry, prevalence1$study_design)
+```
+
+Finally, we create indicator variable to group studies according to the dates of data collection, we use 5-years intervals between 2000 and 2020
+
+```{r}
+prevalence1<- prevalence1 %>%
+  mutate(
+    before_year=case_when(
+      first_year_data<2000 ~ "2000 or before",
+      first_year_data<=2004 ~ "2001-2004",
+      first_year_data<=2009 ~ "2005-2009",
+      first_year_data<=2014 ~ "2010-2014",
+      TRUE ~ "2015 or after")) 
+
+table(prevalence1$before_year)
 ```
 
 # Exploratory data analysis 
@@ -125,9 +155,8 @@ prevalence1 %>%
   mutate(prop = prop.table(n)*100)
 ```
 
-- What is the median first year of data in the studies? 
-- What is the range of years included in the studies? 
-
+- Summarize the first year of data in the studies 
+- What is the range of data_years included in the studies? 
 
 ```{r}
 quantile(prevalence1$first_year_data, na.rm = T)
@@ -166,16 +195,10 @@ prevalence1 %>%
 ```
 
 - How many were conducted before 2010 and 2000?
+    + First, we have to create a new indicator variable that classifies the first year of data in several 5-years groups 
 
 ```{r}
-# create indicator variable for study data collection date and summarize it 
-prevalence1<- prevalence1 %>%
-  mutate(
-    before_year=case_when(first_year_data<2000 ~ "2000 or before",
-                          first_year_data<=2004 ~ "2001-2004",
-                          first_year_data<=2009 ~ "2005-2009",
-                          first_year_data<=2014 ~ "2010-2014",
-                          TRUE ~ "2015 or after")) 
+
 prevalence1 %>% 
   filter(is_registry==0) %>% 
   count(before_year) %>% 
@@ -191,8 +214,8 @@ prevalence1 %>%
   theme_classic()
 ```
 
-
 - What is the median sample size of the non-registry studies?
+    + Does this change according to the year of data collection?
 
 ```{r}
 prevalence1 %>% 
@@ -211,16 +234,18 @@ prevalence1 %>%
   theme(plot.subtitle = element_text(color="red4"))
  
 ```
- 
 
 # Meta analysis
 
 ## All studies meta-analysis
 
-We will first approximate the prevalence of NTM infection using all data. We will use the variable `all_ntm_infection` which contains the number of events and `sample_size_cf` as the denominator. 
+We will first approximate the prevalence of NTM infection using all data. 
+- Numerator: `all_ntm_infection` which contains the number of events
+- Denominator: `sample_size_cf`  
 
 ```{r}
-prevalence1 %>% select(id, all_ntm_infection, sample_size_cf)
+prevalence1 %>% 
+  select(id, all_ntm_infection, sample_size_cf)
 ```
 
 We drop the studies that do not include a raw count of events
@@ -232,25 +257,30 @@ infection<- prevalence1 %>%
   filter (!is.na(all_ntm_infection)) 
 ```
 
+Then fit our meta-analysis with the `meta::metaprop` function
+ - sm=PLOGIT specifies to use the logit transformation for the proportions
+ - hakn=TRUE applies an adjustment for more conservative confidence intervals
+ - comb.random=T specified a random effects model
+ 
+
 ```{r}
-m.full <- metaprop(event = all_ntm_infection,
+meta.full <- metaprop(event = all_ntm_infection,
                    n = sample_size_cf,
                    studlab = id,
                    data = infection,
                    method = "inverse",
-                   sm = "PAS",
-                   comb.fixed = FALSE,
+                   sm = "PLOGIT",
                    comb.random = TRUE,
                    hakn = TRUE,
                    title = "NTM infection prevalence")
 
-m.full
+meta.full
 ```
 
 Now, lets produce a forest plot for this MA, a little bit crowded
 
 ```{r}
-forest.meta(m.full, 
+forest.meta(meta.full, 
             sortvar = TE,
             predict = TRUE, 
             print.tau2 = FALSE,
@@ -262,54 +292,50 @@ forest.meta(m.full,
 According to study design, registry or not. 
 
 ```{r}
-update.meta(m.full,
+update.meta(meta.full,
             byvar = is_registry, 
             tau.common = F)
 # high heterogeneity in both
+# subgroup test is significant but not relevant (98.9 vs 99.8)
 
-update.meta(m.full,
+update.meta(meta.full,
             byvar = study_design, 
             tau.common = T)
-# reduced heterogeneity according to study design, lower in cohort studies
+# reduced heterogeneity according to study design, lower in cohort studies (82% vs 99%)
 
-reg1<- prevalence1 %>% 
+registry_only<- prevalence1 %>% 
   filter (is_registry==1 & !is.na(all_ntm_infection))
+
 m.registry <- metaprop(event = all_ntm_infection,
                    n = sample_size_cf,
                    studlab = id,
-                   data = reg1,
+                   data = registry_only,
                    method = "inverse",
-                   sm = "PAS",
+                   sm = "PLOGIT",
                    comb.random = TRUE,
                    hakn = TRUE,
                    title = "NTM infection prevalence in registry studies")
 forest.meta(m.registry,
             layout="RevMan5")
-  update.meta(m.full,
-            byvar = study_design, 
-            tau.common = T)
-
-forest.meta(s.design)
-
 
 ```
 
 Now, according to the year when the first data was collected.
 
 ```{r}
-update.meta(m.full,
+update.meta(meta.full,
             byvar = before_year, 
             tau.common = F)
-# reduced heterogeneity in one of the periods
+# we see reduced heterogeneity in some of the periods but the omnibus test is not significant
 ```
 
 According to regions now
 
 ```{r}
-update.meta(m.full,
+update.meta(meta.full,
             byvar = region, 
             tau.common = F)
-# reduced heterogeneity in LAC and the Middle east
+# reduced heterogeneity in LAC and the Middle east, but still high (>80%)
 ```
 
 ## Multilevel model
@@ -318,33 +344,98 @@ The data from some of the studies (particularly registries) is not independent a
 
 We use the `metafor` package to fit multilevel meta-analysis. 
 
-First, we need to calculate the raw proportions using the escalc function
+First, we need to calculate the effect size (proportions) using the escalc function
+- We specify Logit transformed proportions `"PLO"` as they seem to have better characteristics compared to other transformations _(Schwarzer 2019)_
+- the additional variables are appended to the dataframe `infection`
 
 ```{r}
-multi.prevalence<- escalc(data = prevalence1, xi=all_ntm_infection, ni=sample_size_cf, measure="PR")
+infection<- escalc(
+  data = infection, 
+  xi=all_ntm_infection, # number of events
+  ni=sample_size_cf,  # sample size
+  measure="PLO")
 ```
 
-
+The function `rma.mv` fits multilevel meta-analysis according to the random option
+- `< random = ~ 1 | a/b >` specifies that b is nested in a  
+- `< random = ~ a | b >` specifies that a is an inner grouping and b an outer grouping level
 
 ```{r}
 multilv.registry <- rma.mv(yi = yi, 
                      V = vi, 
                      slab = id,
-                     data = multi.prevalence,
+                     data = infection,
                      random = ~ 1 | used_registry/id, 
                      test = "t", 
                      method = "REML") 
 
 summary(multilv.registry)
+exp(-3.1103)
 ```
 
+Now, lets evaluate the variance explained by every level of our hierarchical model. 
+Level 3 is the level where we grouped according to registry. 
 
 ```{r}
 var.comp(multilv.registry)
-
 ```
 
 
+## Including multiple moderators (meta-regression)
+
+In the `metafor` package, we can use the `rma.uni` function to fit almost all meta-analysis and indicate the moderators (grouping variables) to be used. 
+
+Syntax options for moderators:
+ - mods = cbind(mod1,mod2,mod3)
+ - mods= ~ mod1 + mod2 + mod3
+
+First, lets validate our results in the meta package by fitting the same model with all studies and no moderators
+- _slab_ indicates the study label
+- _yi & vi_ indicate the study effect measures, already calculated using escalc
+- _method_ specified the fitting method, we use REML
+
+```{r}
+metafor.full <- rma.uni(
+  yi = yi, 
+  vi = vi, 
+  slab = id,
+  data = infection,
+  test = "knha",
+  method = "REML"
+  )
+
+summary(meta.full); 
+summary(metafor.full)
+coef(metafor.full) %>% exp()
+
+# provides roughly the same results
+```
+
+Now, let us fit a meta-regression model to evaluate the heterogeneity according to our pre-specified subgroups
+```{r}
+# re-arrange levels of factors
+infection$region <- relevel(infection$region, ref="NAM")
+levels(infection$region)
+
+infection$before_year <- infection$before_year %>% 
+  as_factor() %>% 
+  relevel(ref="2015 or after")
+levels(infection$before_year)
+
+
+
+metareg <- rma.uni(
+  yi = yi, 
+  vi = vi,
+  mods= ~ region + before_year + age_group + study_design, 
+  slab = id,
+  data = infection,
+  test = "knha",
+  method = "REML"
+  )
+
+summary(metareg)
+```
 
 
 ## Publication bias
@@ -352,11 +443,11 @@ var.comp(multilv.registry)
 For the meta-analysis of all studies
 
 ```{r}
-funnel.meta(m.full,
+funnel.meta(meta.full,
             xlim = c(-0.5, 2),
             studlab = F)
 
-funnel.meta(m.full, xlim = c(-0.5, 2),
+funnel.meta(meta.full, xlim = c(-0.5, 2),
             contour = c(0.9, 0.95, 0.99),
             col.contour = c("gray75", "gray85", "gray95"))
 ```
