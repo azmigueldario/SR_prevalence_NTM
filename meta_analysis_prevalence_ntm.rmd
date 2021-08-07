@@ -62,7 +62,7 @@ require(meta)
 require(metafor)
 ```
 
-## Data import and cleaning
+## Data import 
 
 We will analyze the prevalence as a proportion and the incidence as a rate, data depending. The data from the study cohort is saved in the working directory as a `___.csv` file. 
 
@@ -79,8 +79,7 @@ We start by importing the dataset, changing all character variables to factors a
 ```{r, message=FALSE}
 getwd()
 prevalence <- read_csv("D:/Git/SR_prevalence_NTM/20210719-data_meta_analysis_qa.csv")  %>% 
-  mutate(mabs_infection = as.numeric(mabs_infection)) %>%
-  mutate(across(where(is.character), as_factor)) 
+  mutate(mabs_infection = as.numeric(mabs_infection)) 
 
 
 prevalence$used_registry<- fct_explicit_na(prevalence$used_registry, "no")
@@ -89,14 +88,14 @@ table(prevalence$used_registry)
 glimpse(prevalence)
 ```
 
+## Data wrangling
 
 To produce more quality plots in the future, I make some modifications to separate the publication year and the name of the author. The function `stringr::str_to_title()` puts the first letter of every string to Upper case.  
 
- 
 ```{r}
 prevalence <-  prevalence %>% 
   mutate(
-    slab=stringr::str_to_title(
+    study=stringr::str_to_title(
       gsub("([a-z])([0-9])", "\\1 \\2", prevalence$id))
   )
 ```
@@ -117,7 +116,7 @@ prevalence1<- prevalence %>%
 table(prevalence1$is_registry, prevalence1$study_design)
 ```
 
-Finally, we create indicator variable to group studies according to the dates of data collection, we use 5-years intervals between 2000 and 2020
+Also, we create indicator variable to group studies according to the dates of data collection, we use 5-years intervals between 2000 and 2020
 
 ```{r}
 prevalence1<- prevalence1 %>%
@@ -130,6 +129,55 @@ prevalence1<- prevalence1 %>%
       TRUE ~ "2015 or after")) 
 
 table(prevalence1$before_year)
+```
+
+## Cleaning quality assessment data
+
+When we analyze the risk of bias of the included studies, we will require a particular data structure in variables. 
+
+- We used the Joana Briggs appraisal tool for prevalence studies and the answers in the tool have the options Yes, No and Unclear. However, to plot it we need to approximate these options to the ones standardized by cochrane which would be Yes=Low, No=High, Unclear=Unclear. 
+
+```{r}
+prevalence1<- prevalence1 %>% 
+  mutate_at(.vars = vars(starts_with("Q")), 
+            .funs = function(x) recode_factor (x, 
+                                       `Yes` = "Low", 
+                                       `Unclear` = "Unclear", 
+                                       `No` = "High", 
+                                       `Missing` = "Missing")) 
+```
+
+
+- Also, for the meta-analysis, we will conduct a sensitivity analysis based on the overall quality of the studies. We make the following definitions based on the author's considerations of the most important factors in the quality appraisal:
+    + Low risk must have a low risk in: Adequate sampling frame, sampling scheme, statistical calculation and NTM identification methods
+    + High risk if there is a high risk in any of the following: sampling frame, sampling scheme, identification methods, statistical methods, description of the population or standard measurement
+    + Unclear risk for all other groups
+
+
+```{r}
+prevalence1 <- 
+  prevalence1 %>%
+  mutate(Overall_Q=case_when(
+    qa_sampleframe=="Yes" & qa_sampling=="Yes" & qa_idmethods=="Yes" & qa_stats=="Yes" ~ "Low",
+    qa_sampleframe=="No" | qa_sampling=="No" | qa_idmethods=="No" | qa_standard_measurement=="No" |
+      qa_stats=="No" ~ "High",
+    TRUE ~ "Unclear")) 
+```
+
+Finally we rename the quality assessment variables so they represent more clearly each of the domains of the Joana Briggs tool for quality asessment. 
+
+```{r}
+prevalence1 <-  prevalence1 %>% 
+  rename(
+    "Q1_Sampling_frame"="qa_sampleframe",
+    "Q2_Sampling_scheme"="qa_sampling",
+    "Q3_Sample_size"="qa_samplesize", 
+    "Q4_Population_description"="qa_popdescription", 
+    "Q5_Coverage_of_sample"="qa_coveragesample",
+    "Q6_Identification_methods"="qa_idmethods", 
+    "Q7_Standardized_measurement"="qa_standard_measurement",
+    "Q8_Statistical_calculation"="qa_stats",
+    "Q9_Response_rate"="qa_responserate") 
 ```
 
 # Exploratory data analysis 
@@ -219,12 +267,12 @@ prevalence1 %>%
 
 ```{r}
 prevalence1 %>% 
-  filter(is_registry==0 & is.na(used_registry)) %>% 
+  filter(is_registry==0 & !is.na(used_registry)) %>% 
   summarize(
   quantile (sample_size_cf, na.rm=T))
 
 prevalence1 %>% 
-  filter(is_registry==0 & is.na(used_registry)) %>% 
+  filter(is_registry==0 & !is.na(used_registry)) %>% 
   ggplot(aes(y=sample_size_cf, x=first_year_data)) +
   geom_point() +
   labs (title="Sample size according to year of data",
@@ -262,7 +310,6 @@ Then fit our meta-analysis with the `meta::metaprop` function
  - hakn=TRUE applies an adjustment for more conservative confidence intervals
  - comb.random=T specified a random effects model
  
-
 ```{r}
 meta.full <- metaprop(event = all_ntm_infection,
                    n = sample_size_cf,
@@ -306,7 +353,7 @@ update.meta(meta.full,
 registry_only<- prevalence1 %>% 
   filter (is_registry==1 & !is.na(all_ntm_infection))
 
-m.registry <- metaprop(event = all_ntm_infection,
+meta.registry <- metaprop(event = all_ntm_infection,
                    n = sample_size_cf,
                    studlab = id,
                    data = registry_only,
@@ -315,7 +362,7 @@ m.registry <- metaprop(event = all_ntm_infection,
                    comb.random = TRUE,
                    hakn = TRUE,
                    title = "NTM infection prevalence in registry studies")
-forest.meta(m.registry,
+forest.meta(meta.registry,
             layout="RevMan5")
 
 ```
@@ -422,8 +469,6 @@ infection$before_year <- infection$before_year %>%
   relevel(ref="2015 or after")
 levels(infection$before_year)
 
-
-
 metareg <- rma.uni(
   yi = yi, 
   vi = vi,
@@ -437,6 +482,7 @@ metareg <- rma.uni(
 summary(metareg)
 ```
 
+# Complementary analyses
 
 ## Publication bias
 
@@ -456,5 +502,78 @@ We observe an asymmetrical plot lacking studies with a smaller proportion of NTM
 
 ```{r}
 
+```
+
+## Risk of bias appraissal
+
+
+```{r, message=F}
+require (robvis)
+```
+
+```{r}
+prevalence1 %>% 
+  mutate_at(vars(contains(qa)), recode, `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5` = 1)
+```
+
+
+We need to accommodate our data to the required form for the package. 
+
+First, we select only the variables that contain quality assessment data and transform the data into a `data.frame` object.
+
+We define studies with Low risk of bias as those with an adequate sampling frame, taken from a census or a random sampling, having properly described identification methods and reporting of statistical measures
+
+```{r}
+prevalence_rob <- 
+  prevalence1 %>%
+  mutate(Overall=case_when(qa_sampleframe=="No" | qa_sampling=="No" | 
+                              qa_idmethods=="No" | qa_standard_measurement=="No" | 
+                             qa_stats=="No" ~ "High",
+                           qa_sampleframe=="Yes" & qa_sampling=="Yes" &
+                             qa_idmethods=="Yes" & qa_stats=="Yes" ~ "Low",
+                           TRUE ~ "Unclear")) %>% 
+  select(slab, contains("qa"), Overall) %>% 
+  as.data.frame() 
+```
+
+Now, we change the names of the variables so they have more meaning in the resultsing plots. We also recodify the `NA` variables to represent "Missing" for the function
+
+```{r}
+prevalence_rob  <- 
+  apply(prevalence_rob,
+        MARGIN= 2, 
+        function(x) fct_explicit_na(x, na_level = "Missing")) %>%
+  as.data.frame() %>%
+  mutate(across(where(is.character), as.factor))
+
+colnames(prevalence_rob) <- c("Study", "Q1_Sampling_frame","Q2_Sampling_scheme",
+                              "Q3_Sample_size", "Q4_Population_description", "Q5_Coverage_of_sample",
+                              "Q6_Identification_methods", "Q7_Standardized_measurement", 
+                              "Q8_Statistical_calculation", "Q9_Response_rate", "Overall")
+```
+
+
+```{r}
+prevalence_rob %>% 
+  mutate_at(.vars = vars(starts_with("Q")), 
+            .funs = function(x) recode_factor (x, 
+                                       `Yes` = "Low", 
+                                       `Unclear` = "Unclear", 
+                                       `No` = "High", 
+                                       `Missing` = "Missing"))
+```
+
+
+Now, we produce both plots (traffic light and summary) using the rob.summary function from the `dmetar` package
+
+Because we are including all studies here, the traffic light picture is pretty crowded
+
+```{r}
+rob.summary(prevalence_rob, name.high="No", name.unclear="Unclear",
+    name.low="Yes", name.missing = "Missing", studies=prevalence_rob$Study, table = T)
+```
+
+```{r}
+robvis::rob_traffic_light (prevalence_rob, tool="ROB1", colour = "cochrane", psize = 8)
 ```
 
