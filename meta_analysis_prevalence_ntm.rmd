@@ -1,52 +1,56 @@
 ---
 title: "Analysis: systematic review of nontuberculous mycobacteria prevalence in cystic fibrosis"
 author: "MDP"
-date: "09/08/2021"
+date: "10/10/2021"
 output: 
   html_document:
     toc: true
-    toc_depth: 3
-    theme: flatly
+    toc_depth: 2
+    theme: united
+    number_sections: true
 editor_options: 
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, eval=F)
 ```
 
 # Introduction
 
-Our systematic review is a comprehensive picture of all studies and registry reports that include prevalence/incidence of _nontuberculous mycobacteria (NTM)_ in _cystic fibrosis_ population
+Our systematic review is a comprehensive picture of all studies and registry reports that include prevalence/incidence of _nontuberculous mycobacteria (NTM) in cystic fibrosis_ population
 
-The analysis will be performed in R in a _Github_ version control repository
+The analysis will be performed in R (v4.1.1) with __Github__ version control repository.We will analyze the prevalence as a proportion and the incidence as a rate, depending on availability in results. The data from the study cohort is saved in the `input` sudirectory as a `.csv` file. 
 
-## Aims
+To conduct meta-analysis of proportions, we require the following observations per study 
+- _sample size_
+- _study id_
+- _number of events_
+
+Other variables are included to perform complementary analyses. 
+
+### Aims
 1. Explore our data and summarize it briefly
 2. Explore publication bias and produce plots
 3. Conduct meta-analysis of selected studies and produce summary plots
 4. Perform pre-specified subgroup analysis
-5. Conduct exploratory sensitivity analysis
+5. Conduct exploratory sensitivity analysis, meta regression and hierarchical analysis
 
 ### Suggestions for analysis 
 
-*__July 6, 2021__*
 
-i.	Contemporary cohort, maybe including only data from 2010 and onwards _#done_
-ii.	Subgroup by high quality studies according to quality appraisal _done_
-iii.	Control for overlap over years in registry studies with the random effects model (dependency in data) _#done_
-iv.	Subgroup of registry data vs peer-reviewed data _#done_
-v.	Also, subgroup according to dates or regions _#done_
-
-*__July 20, 2021__*
-
-i. Tips for discussion: implications of screening, raising prevalence?, implications of design, baseline status before modulators
-ii. Contact canada/australia registries for raw numbers of NTM cases _#done, not available_
-iii. Corroborate that the numbers in the UK and ECFS registries match _#done, umbers match properly_ 
+-	Contemporary cohort, maybe including only data from 2010 and onwards _#done_
+- Subgroup by high quality studies according to quality appraisal _done_
+- Control for overlap over years in registry studies with the random effects model (dependency in data) _#done_
+- Subgroup of registry data vs peer-reviewed data _#done_
+- Also, subgroup according to dates or regions _#done_
+- Tips for discussion: implications of screening, raising prevalence?, implications of design, baseline status before modulators
+- Contact canada/australia registries for raw numbers of NTM cases _#done, not available_
+- Corroborate that the numbers in the UK and ECFS registries match _#done, numbers match properly_ 
 
 # Data wrangling
 
-__*Loading required packages*__
+Load required packages
 
 - `dmetar` with its associated packages for some helpful functions 
 - `meta` and `metafor` for meta-analysis, funnel plots, forest plots and meta-regression
@@ -63,63 +67,52 @@ require (knitr)
 
 ## Data import 
 
-We will analyze the prevalence as a proportion and the incidence as a rate, data depending. The data from the study cohort is saved in the working directory as a `___.csv` file. 
-
-To conduct meta-analysis of proportions, we require the following observations per study 
-- _sample size_
-- _study id_
-- _number of events_
-
-Other variables are included to perform subgroup analysis and to conduct exploratory data analysis. 
-We start by importing the dataset, changing all character variables to factors and cleaning the class of one of the variables:
-- _used_registry_ that contains the name of the registry used
-- _qa..._ contains the answers to the questions in the JBI assessment tool
+We start by importing the dataset, changing all character variables to factors and doing some cleaning. 
+- _used_registry_ contains the name of the registry used
 
 ```{r, message=FALSE}
-getwd()
-prevalence <- read_csv("D:/Git/SR_prevalence_NTM/20210912-data_meta_analysis_qa.csv")  %>% 
-  mutate(mabs_infection = as.numeric(mabs_infection)) 
+input_data <- read_csv("./input/20210912-data_meta_analysis_qa.csv")  %>% 
+  mutate(mabs_infection = as.numeric(mabs_infection),
+         used_registry=fct_explicit_na(used_registry, "no")) 
 
+# table(input_data$used_registry)
 
-prevalence$used_registry<- fct_explicit_na(prevalence$used_registry, "no")
-table(prevalence$used_registry)
-
-glimpse(prevalence)
+glimpse(input_data)
 ```
 
 ## Data wrangling
 
-To produce more quality plots in the future, I make some modifications to separate the publication year and the name of the author. The function `stringr::str_to_title()` puts the first letter of every string to Upper case.  
+To produce quality plots, I create a variable in the form `Author YYYY`. 
 
 ```{r}
-prevalence <-  prevalence %>% 
+messy_data <-  input_data %>% 
   mutate(
-    study=stringr::str_to_title(
-      gsub("([a-z])([0-9])", "\\1 \\2", prevalence$id))
+    study=gsub("([a-z])([0-9])", "\\1 \\2", id),
+    study=stringr::str_to_title(study) # changes first letter to upper-case
   )
 ```
 
-The study design variable may have some weird coding lo let us unify it.  
-- Also, let us create a new indicator variable for registry vs others.
+We unify the type of study design under 3 categories and create an indicator variable for registry_report(y/n)
 
 ```{r}
-table(prevalence$study_design)
+table(messy_data$study_design)
 
-prevalence1<- prevalence %>%
-  mutate(study_design=case_when(study_design=="Cross-sectional study" ~ "cross sectional",
+messy_data<- messy_data %>%
+  mutate(study_design=case_when(study_design=="Cross-sectional study" ~ "cross_sectional",
                                 study_design=="Registry report" ~ "registry",
                                 TRUE ~ "cohort"),
          is_registry=case_when(study_design=="registry" ~ 1,
                                TRUE ~ 0))
 
-table(prevalence1$is_registry, prevalence1$study_design) %>% 
+messy_data %>% 
+  count(is_registry, study_design) %>% 
   kable()
 ```
 
-Also, we create indicator variable to group studies according to the dates of data collection, we use 5-years intervals between 2000 and 2020
+We create a grouping variable according to the first year of data collection of a study. We use 5-years intervals between 2000 and 2020
 
 ```{r}
-prevalence1<- prevalence1 %>%
+messy_data<- messy_data %>%
   mutate(
     before_year=case_when(
       first_year_data<2000 ~ "2000 or before",
@@ -128,39 +121,45 @@ prevalence1<- prevalence1 %>%
       first_year_data<=2014 ~ "2010-2014",
       TRUE ~ "2015 or after")) 
 
-table(prevalence1$before_year) %>% 
+table(messy_data$before_year) %>% 
   kable()
 ```
 
-As the variable region is going to be used as a grouping variable in the meta-analysis and some of the levels, Australia(AUS) and Middle-East (ME), have small numbers in the subgroup. We record them together with LatinAmerica(LAC) into a category called Other
+The variable `region` is has some low numbers in some of the levels {AUS, ME & LAC}. For further analysis, I group them together in a single new level (others)
 
 ```{r}
-table(prevalence1$region) %>% 
-  kable()
+# table(messy_data$region)
 
-prevalence1 <- prevalence1 %>% 
+messy_data <- messy_data %>% 
   mutate(region1=case_when(region=="NAM"~"NAM",
                            region=="EUR"~"EUR",
                            TRUE ~ "Other"))
-table(prevalence1$region1) %>% 
+count(messy_data, region1) %>% 
   kable()
-
 ```
 
 ## Cleaning quality assessment data
 
-When we analyze the risk of bias of the included studies, we will require a particular data structure in variables. 
+To plot risk of bias graphs we need a specific data structure. 
 
-- We used the Joana Briggs appraisal tool for prevalence studies and the answers in the tool have the options Yes, No and Unclear. However, to plot it we need to approximate these options to the ones standardized by cochrane which would be Yes=Low, No=High, Unclear=Unclear. 
+- We used the Joanna Briggs appraisal tool for prevalence studies with answer options = {Yes, No, Unclear}. 
+- We standardize to Cochrane categories coding _Yes=Low, No=High, Unclear=Unclear_ 
 
 ```{r}
-prevalence1<- prevalence1 %>% 
-  mutate_at(.vars = vars(starts_with("Q")), 
+messy_data<- messy_data %>% 
+  mutate_at(.vars = vars(starts_with("q")), 
             .funs = function(x) recode_factor (x, 
                                        `Yes` = "Low", 
                                        `Unclear` = "Unclear", 
                                        `No` = "High", 
                                        `Missing` = "Missing")) 
+messy_data<- 
+  messy_data %>% 
+  mutate(across(starts_with("qa"), ~ recode_factor (.x,
+                                                    `Yes` = "Low",
+                                                    `Unclear` = "Unclear",
+                                                    `No` = "High",
+                                                    `Missing` = "Missing")))
 table(prevalence1$Q1_Sampling_frame)
 ```
 
@@ -168,10 +167,11 @@ table(prevalence1$Q1_Sampling_frame)
 Finally we rename the quality assessment variables so they represent more clearly each of the domains of the Joana Briggs tool for quality asessment. It will also make for prettier plots.
 
 ```{r}
-prevalence1 <-  prevalence1 %>%
-rename(
-  "Q1_Sampling_frame"="qa_sampleframe",
-  "Q2_Sampling_scheme"="qa_sampling",
+messy_data <-  
+  messy_data %>%
+  rename(
+    "Q1_Sampling_frame"="qa_sampleframe",
+    "Q2_Sampling_scheme"="qa_sampling",
   "Q3_Sample_size"="qa_samplesize",
   "Q4_Population_description"="qa_popdescription",
   "Q5_Coverage_of_sample"="qa_coveragesample",
@@ -180,6 +180,7 @@ rename(
   "Q8_Statistical_calculation"="qa_stats",
   "Q9_Response_rate"="qa_responserate")
   
+colnames(messy_data) [17:25] %>% write.csv(file="a.csv")
   
 table(prevalence1$Q1_Sampling_frame) 
 ```

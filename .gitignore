@@ -57,7 +57,7 @@ vignettes/*.pdf
 #*README_files/
 
 # Ignore any data file 
-*.csv
+
 *.xls
 *.xlsX
 *.xlsx
