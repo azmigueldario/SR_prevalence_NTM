@@ -60,4 +60,7 @@ vignettes/*.pdf
 *.csv
 *.xls
 *.xlsX
+*.xlsx
 *.txt
+/data
+/input

@@ -339,6 +339,36 @@ prevalence1 %>%
   theme(plot.subtitle = element_text(color="red4")) 
 ```
 
+## How many studies report every outcome
+
+__NTM disease period prevalence was reported in 9 studies__
+__NTM disease point prevalence in only 1__
+__Incidence proportion was reported in 4 studies__
+
+Point prevalence NTM infection
+
+```{r}
+
+
+prevalence1 %>% 
+  filter(last_year_data - first_year_data < 2 ) %>%
+  count() %>% 
+  mutate(prop=round(n/93*100, 1))
+
+prevalence1 %>% 
+  filter(last_year_data - first_year_data >= 2 |
+          is.na(last_year_data) ) %>%
+  count() %>% 
+  mutate(prop=round(n/93*100, 1))
+
+
+
+summarize(
+  sample_size_quantiles=quantile(sample_size_cf, na.rm=T)) %>% 
+  kable()
+```
+
+
 # Meta analysis of NTM infection
 
 ## All studies meta-analysis
@@ -477,20 +507,17 @@ prevalence1 %>%
 ```
 
 
-### Observational studies only Meta-analysis
+### Observational studies point prevalence Meta-analysis
 
 1. Only point prevalence is included to minimize error caused by looking at multiple years
-2. 
-
-#### Point prevalence
 
 ```{r}
 prevalence1 %>% 
   filter (!is.na(all_ntm_infection),
           is_registry==0,
-          last_year_data - first_year_data<2
+          last_year_data - first_year_data<2,
+          study_design=="cross sectional"
           ) %>%
-  view()
   metaprop(event = all_ntm_infection,
            n = sample_size_cf,
            studlab = study,
