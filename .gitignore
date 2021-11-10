@@ -47,6 +47,7 @@ vignettes/*.pdf
 ~$*.xls*
 *.xlk
 ~$*.ppt*
+*.txt
 
 # Prevent mac users to commit .DS_Store files
 *.DS_Store
@@ -55,12 +56,3 @@ vignettes/*.pdf
 *README.html
 *README_cache/
 #*README_files/
-
-# Ignore any data file 
-
-*.xls
-*.xlsX
-*.xlsx
-*.txt
-/data
-/input

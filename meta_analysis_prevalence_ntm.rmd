@@ -763,7 +763,7 @@ inf_point_data %>%
 ```
 
 
-# Complementary analyses
+# Complementary analyses for meta-analysis
 
 ## Publication bias (funnel plot)
 
@@ -857,7 +857,7 @@ metafor::selmodel(metafor.full,
                   verbose=T)
 ```
 
-## Risk of bias appraissal
+# Risk of bias appraissal
 
 We will summarize the Quality assessment recorded from the Joanna Briggs tool. Unfortunately, there is no easy way to plot this in R and we have to create a new dataframe that fulfills the requirements of the available tools:
 
