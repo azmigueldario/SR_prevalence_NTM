@@ -73,7 +73,7 @@ We start by importing the dataset, changing all character variables to factors a
 ```{r, message=FALSE}
 temp <-  list()
 temp$input <- 
-  read_csv("./input/20211001-data_meta_analysis_qa.csv")  %>% 
+  read_csv("./input/20211108-data_meta_analysis_qa.csv")  %>% 
   mutate(mabs_infection = as.numeric(mabs_infection),
          used_registry=fct_explicit_na(used_registry, "no")) 
 
@@ -525,12 +525,6 @@ inf_point_data %>%
             subgroup =  study_design,
             tau.common = F) %>% 
   forest_wrapper()
-update.meta(meta.full,
-            byvar = study_design,
-            subset = used_registry!=Brazil,
-            tau.common = F) %>% 
-forest_wrapper(data =.)
-
 
 ```
 
@@ -767,10 +761,35 @@ inf_point_data %>%
 
 ## Publication bias (funnel plot)
 
+For the meta-analysis of all studies (contour-enhanced funnel plot)
 
-```{r}
+```{r all studies funnel plot and egger's test}
+funnel(x=metafor.full,
+       xlab="Logit transformed proportions",
+       level=c(90, 95, 99), 
+       shade=c("white", "gray55", "gray75"),
+       legend="topleft", 
+       atransf = transf.ilogit)
 
-metafor.full.2 <- 
+regtest(metafor.full,
+        model = "rma",
+        predictor = "sei",
+        ret.fit = T)
+
+# for the metaregression 
+regtest(metareg,
+        model = "rma",
+        predictor = "sei",
+        ret.fit = T
+        )
+
+```
+
+There is a significant p_value including all studies (p=0.0088), and  we can see an asymmetry at the lower left side (low SE and small estimate) which probably correspond to the Brazilian registry reports
+
+```{r excluding Brazil registry (funnel & egger's test)}
+
+temp$maetafor_not_brazil <- 
 inf_point_data  %>% 
   filter(used_registry!="Brazil") %>% 
   escalc(
@@ -785,48 +804,25 @@ inf_point_data  %>%
     data = .,
     test = "knha",
     method = "REML")
-```
 
 
-For the meta-analysis of all studies (contour-enhanced funnel plot)
-
-```{r}
-funnel(x=metafor.full,
+funnel(x=temp$maetafor_not_brazil,
        xlab="Logit transformed proportions",
        level=c(90, 95, 99), 
        shade=c("white", "gray55", "gray75"),
        legend="topleft", 
        atransf = transf.ilogit)
-
-```
-
-We observe an asymmetrical plot lacking studies with a smaller proportion of NTM infection_data
-
-```{r}
-regtest(metafor.full)
-
-regtest(metafor.full,
+regtest(temp$maetafor_not_brazil,
         model = "rma",
         predictor = "sei",
         ret.fit = T)
-
-# Using the estimate of the intercept, we can evaluate an estimate under perfect conditions
-transf.ilogit(c(-2.4318,-2.8778,-1.9857))
-
-# for the metaregression 
-reg<- regtest(metareg,
-        model = "rma",
-        predictor = "sei",
-        ret.fit = T
-        )
-
 ```
 
-Interestingly, there is no association between sample size and predictor according to the Egger test altough close to the significance level (p=0.06). When we evaluate this influence after correcting for predictors in metaregression we see that the value is farther from the significance level. 
+If we exclude these reports, the asymmetry is removed and the p-value turns non-significant. These reports have a poor screening rate, but report the prevalence as if all subjects were studied. 
 
 ## Publication bias (Trim & Fill method)
 
-The trim and fill method detects places of asimmetry in the funnel plot and inputs studies to achieve a more balanced estimation. It is used to quantify the degree of small studies bias in our results. 
+The trim and fill method detects places of asymmetry in the funnel plot and inputs studies to achieve a more balanced estimation. It is used to quantify the degree of small studies bias in our results. 
 
 ```{r}
 trimfill(metafor.full)
@@ -835,7 +831,7 @@ trimfill(metafor.full)
 transf.ilogit(-2.7489)
 ```
 
-No study was inputed using these method and the estimatre did not change at all. 
+No study was imputed using these method and the estimate did not change at all. 
 
 ## Pubication bias (p-value curves)
 
@@ -924,3 +920,16 @@ clean_data %>%
 rob_traffic + 
   theme(text = element_text(size = 20))
 ```
+
+# Exploration of period prevalence
+
+We will summarize the number of studies reporting period prevalence, the regions were they come from and the 
+
+```{r}
+count(clean_data, period_prevalence)
+```
+
+```{r}
+sessionInfo()
+```
+
