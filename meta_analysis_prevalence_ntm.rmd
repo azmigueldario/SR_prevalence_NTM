@@ -188,7 +188,7 @@ temp$untidy_data <-
   rename_with(.cols = contains("Q"), 
               ~ gsub("^(Q[0-9]).*","\\1", .x)) %>%
   mutate(
-    Overall_Q=
+    Overall_risk=
       case_when(
         Q1=="High"|Q2=="High"|Q3=="High"|Q4=="High"|
           Q6=="High"|Q8=="High" ~ "High",
@@ -729,10 +729,10 @@ var.comp(multilvl.meta)$results %>%
 We also conduct a subgroup analysis to evaluate if there are different estimates of prevalence of NTM infection according to the Overall risk of bias determined by the JBI tool
 
 ```{r}
-table(inf_point_data$Overall_Q)
+table(inf_point_data$Overall_risk)
 
 update.meta(meta.full,
-            subgroup =  Overall_Q, 
+            subgroup =  Overall_risk, 
             tau.common = F)
 ```
 
@@ -740,7 +740,7 @@ The statistical test shows that there is significant difference according to the
 
 ```{r}
 update.meta(meta.full,
-            subgroup = Overall_Q, 
+            subgroup = Overall_risk, 
             tau.common = F) %>%
   forest_wrapper(subgroup.name = "Overall Risk of Bias (JBI)")
 
@@ -750,7 +750,7 @@ To finalize these subgroup analyses, I will plot only the low risk of bias studi
 
 ```{r}
 inf_point_data %>% 
-  filter(Overall_Q=="Low") %>%
+  filter(Overall_risk=="Low") %>%
   metaprop_formatted(data=.) %>% 
   forest_wrapper(stu.res = T, xlim = c(0,0.3), sort.var = .$stulab)
   
@@ -875,7 +875,7 @@ We define studies with Low risk of bias as those with an adequate sampling frame
 ```{r}
 rob_data <- 
   clean_data %>% 
-  select(study, matches("Q[0-9]"), Overall_Q, study_design, before_year) %>% 
+  select(study, matches("Q[0-9]"), Overall_risk, study_design, before_year) %>% 
   as.data.frame() 
 ```
 
@@ -893,41 +893,114 @@ rob.summary(rob_data,
             table = T)
 ```
 
-Thus, we summarize the quality of studies after subsetting the data properly. 
+Thus, we summarize the quality of studies after sub-setting the data properly. 
+We first produce different summary tables and then a few traffic light plots
 
 ```{r, eval=F}
+rob_data$study_design
 rob_data %>% 
-  filter(study_design=="registry") %>%
   rob.summary(data=., 
             name.high="High", 
             name.unclear="Unclear",
             name.low="Low", 
             name.missing = "Missing", 
-            studies=.$study, 
-            table = T)
+            studies=.$study)
+
+
+
+```
+
+```{r}
 
 robvis::rob_traffic_light()
 clean_data %>%
-  filter(study_design=="registry") %>%
-  select(study, matches("Q[0-9]"), Overall_Q) %>%
-  rename(overall=Overall_Q) %>%
+  filter(study_design=="Registry report",
+         grepl("Usa|Australia|Brazil", study)) %>%
+  select(study, matches("Q[0-9]"), Overall_risk) %>%
+  rename(Overall=Overall_risk) %>% 
   as.data.frame() %>%
   robvis::rob_traffic_light(
     data=.,
     tool = "Generic",
-    psize = 4) 
+    psize = 5,
+    overall=FALSE) 
 
 rob_traffic + 
   theme(text = element_text(size = 20))
 ```
 
+
 # Exploration of period prevalence
 
-We will summarize the number of studies reporting period prevalence, the regions were they come from and the 
+## For infection
+
+We will summarize:
+* number of studies reporting period prevalence
+* regions were they come from
+* length of study period
 
 ```{r}
-count(clean_data, period_prevalence)
+count(clean_data, 
+      period_prevalence, period_disease)
+# region
+filter(clean_data, period_prevalence=="yes") %>% 
+  count_table(region1)
+# population
+filter(clean_data, period_prevalence=="yes") %>% 
+  count_table(age_group)
+#study-design
+filter(clean_data, period_prevalence=="yes") %>% 
+  count_table(study_design)
+# study_period length
+filter(clean_data, period_prevalence=="yes") %>% 
+  mutate(
+    study_length=last_year_data-first_year_data+1) %>% count(study_length) %>% 
+  mutate(freq=n*100/35)
+# plot period prevalence values
+filter(clean_data, period_prevalence=="yes") %>% 
+  mutate(pp=all_ntm_infection/sample_size_cf*100) %>% 
+  ggplot(data=., aes(x=0, y=pp)) +
+  geom_boxplot(outlier.shape = NA, width=1) +
+  geom_jitter(width=0.1) +
+  xlim(-1.5, 1.5)
+# sample_size
+clean_data %>% 
+  filter(period_prevalence=="yes") %>%
+  select(sample_size_cf, study) %>%  view
+
+# distribution of prevalence estimates
+filter(clean_data, period_prevalence=="yes") %>% 
+  mutate(pp=all_ntm_infection/sample_size_cf*100) %>%   
+  count(pp) %>% 
+  summary()
+# view results according to study and time-interval
+  filter(clean_data, period_prevalence=="yes") %>% 
+  mutate(
+    study_length=last_year_data-first_year_data+1,
+    pp=all_ntm_infection/sample_size_cf*100) %>% 
+    select(study, study_length, pp,
+           all_ntm_infection, sample_size_cf) %>%  view
+  
+filter(clean_data, period_prevalence=="yes") %>% 
+  count_table(Overall_risk)
 ```
+
+## For NTM disease
+
+```{r}
+temp$period_disease<- 
+  clean_data %>% 
+  filter(period_disease=="yes") %>% 
+  mutate(interval=last_year_data-first_year_data+1)
+
+temp$period_disease %>% count(region1)
+temp$period_disease %>% select(sample_size_cf, study) 
+temp$period_disease %>% select(interval, study) 
+temp$period_disease %>% count(study_design) 
+
+
+```
+
 
 ```{r}
 sessionInfo()
