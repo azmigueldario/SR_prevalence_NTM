@@ -1,5 +1,5 @@
 id,publication_date,study_design,sample_size_cf,region,country,used_registry,age_group,mabs_infection,avium_infection,other_ntm_infection,all_ntm_infection,first_year_data,last_year_data,disease_events,disease_sample,Q1_Sampling_frame,Q2_Sampling_scheme,Q3_Sample_size,Q4_Population_description,Q5_Coverage_of_sample,Q6_Identification_methods,Q7_Standardized_measurement,Q8_Statistical_calculation,Q9_Response_rate,period_prevalence,period_disease
-abidin2020,2020,Cross-sectional study,4687, EUR,United Kingdom,UK,pediatric,176,92,NA,303,2016,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,Yes,Unclear,no,no
+abidin2021,2020,Cross-sectional study,4687, EUR,United Kingdom,UK,pediatric,176,92,NA,303,2016,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,Yes,Unclear,no,no
 adjemian2014,2014,Cross-sectional study,10527, NAM,United States,US,mixed,NA,NA,NA,1384,2010,2011,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,No ,yes,no
 adjemian2018,2018,Cross-sectional study,16153, NAM,United States,US,mixed,NA,1949,NA,3363,2010,2014,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,Yes,no,no
 ahmed2018,2018,Cohort study (prospective),42, EUR,United Kingdom,NA,pediatric,2,2,2,6,2012,2016,NA,NA,Yes,Yes ,No ,Yes,Missing,Yes,Yes,Yes,No ,yes,no
@@ -49,9 +49,9 @@ esther2005,2005,Cross-sectional study,431, NAM,United States,NA,pediatric,8,10,1
 esther2010,2010,Cross-sectional study,829, NAM,United States,NA,mixed,68,98,NA,166,2000,2007,NA,NA,Unclear,Yes ,Yes ,No,Missing,Yes,Unclear,Yes,No ,yes,no
 fauroux1997,1997,Cohort study (prospective),106, EUR,France,NA,pediatric,3,0,4,7,1995,1996,2,106,Unclear,Unclear,No ,No,Missing,Yes,Yes,Yes,Unclear,yes,yes
 fernandez-caso2020,2020,Cross-sectional study,92, EUR,Spain,NA,adult,7,13,9,28,2010,2017,NA,NA,Unclear,Unclear,No ,Yes,Missing,Unclear,Unclear,Unclear,Unclear,yes,no
-gardner2018,2018,Cross-sectional study,5333, EUR,United Kingdom,UK,pediatric,NA,NA,NA,288,2010,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Unclear,no,no
+gardner2019,2018,Cross-sectional study,5333, EUR,United Kingdom,UK,pediatric,NA,NA,NA,288,2010,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Unclear,no,no
 giron2005,2005,Cohort study (prospective),28, EUR,Spain,NA,adult,3,2,2,7,1997,2001,2,25,Yes,Yes ,No ,Yes,Missing,Yes,Yes,Yes,Unclear,yes,yes
-hatziagorou2019,2019,Cohort study (prospective),41101, EUR,NA,ECFS,NA,NA,NA,NA,NA,2011,2016,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,Unclear,no,no
+hatziagorou2020,2019,Cohort study (prospective),41101, EUR,NA,ECFS,NA,NA,NA,NA,NA,2011,2016,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,Unclear,no,no
 hjelt1994,1994,Cross-sectional study,185, EUR,Denmark,NA,mixed,5,3,5,13,1987,1988,NA,NA,Yes,Yes ,No ,No,Missing,Yes,Yes,Yes,Yes,yes,no
 kilby1992,1992,Cross-sectional study,87, NAM,United States,NA,adult,0,13,6,17,1981,1990,NA,NA,Yes,Yes ,No ,Yes,Missing,Yes,No,Yes,Yes,yes,no
 kopp2015,2015,Cross-sectional study,30896, NAM,United States,US,mixed,NA,NA,NA,2512,2007,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Yes,Unclear,yes,no
@@ -89,4 +89,4 @@ usa2018,2019,Registry report,15067, NAM,United States,US,mixed,1009,860,NA,2055,
 usa2019,2020,Registry report,15497, NAM,United States,US,mixed,888,1057,NA,2149,2019,2019,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Yes,Yes,no,no
 valenza2008,2008,Cross-sectional study,60, EUR,Germany,NA,mixed,4,4,NA,8,2006,2006,NA,NA,Yes,Unclear,No ,No,Missing,Yes,Unclear,No ,Unclear,no,no
 viviani2016,2016,Cross-sectional study,13593, EUR,NA,ECFS,mixed,NA,NA,NA,374,2009,2009,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Yes,Yes,Yes,no,no
-yan2019,2019,Cross-sectional study,99,AUS,Australia,NA,pediatric,22,NA,NA,36,2013,2017,NA,NA,Yes,Yes ,No ,No,Missing,Unclear,Yes,Yes,Yes,yes,no
+yan2020,2019,Cross-sectional study,99,AUS,Australia,NA,pediatric,22,NA,NA,36,2013,2017,NA,NA,Yes,Yes ,No ,No,Missing,Unclear,Yes,Yes,Yes,yes,no
