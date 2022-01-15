@@ -1,18 +1,22 @@
 ---
-title: "Analysis: systematic review of nontuberculous mycobacteria prevalence in cystic fibrosis"
+title: 'Analysis: systematic review of nontuberculous mycobacteria prevalence in cystic
+  fibrosis'
 author: "MDP"
-output: 
+output:
+  word_document:
+    toc: yes
+    toc_depth: '2'
   html_document:
-    toc: true
+    toc: yes
     toc_depth: 2
     theme: united
-    number_sections: true
-editor_options: 
+    number_sections: yes
+editor_options:
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval=F)
+knitr::opts_chunk$set(echo = TRUE, eval=T)
 ```
 
 # Introduction
@@ -21,7 +25,7 @@ Our systematic review is a comprehensive picture of all studies and registry rep
 
 The analysis will be performed in R (v4.1.1) with __Github__ version control repository.We will analyze the prevalence as a proportion and the incidence as a rate, depending on availability in results. The data from the study cohort is saved in the `input` directory as a `.csv` file. 
 
-### Aims
+## Aims
 1. Explore our data and summarize it briefly
 2. Explore publication bias and produce plots
 3. Conduct meta-analysis of selected studies and produce summary plots
@@ -38,29 +42,24 @@ Load required packages
 
 ```{r, warning=FALSE, message=FALSE}
 # devtools::install_github("MathiasHarrer/dmetar")
-packages <- c("dmetar", "meta", "metafor", "kableExtra", "gginnards", "tidyverse")
+packages <- c("dmetar", "meta", "metafor", "gginnards", "tidyverse", "flextable")
 lapply(packages, library, character.only=T)
 ```
 
-## Data import 
+## Data import and wrangling
 
 **Make sure to always check that it is the latest dataset.** 
-We import the dataset and recode if they used registry.
 
 ```{r, message=FALSE}
 temp <-  list()
 temp$input <- 
-  read_csv("./input/data_meta_analysis_qa.csv")  %>% 
-  mutate(mabs_infection = as.numeric(mabs_infection),
-         used_registry=fct_explicit_na(used_registry, "no"))
+  read_csv("./input/data_meta_analysis_qa.csv")  %>%
+  mutate(mabs_infection = as.numeric(mabs_infection))
 
-# table(temp$input$used_registry)
-# glimpse(temp$input)
+table(temp$input$used_registry)
 ```
 
-## Data wrangling
-
-To produce quality plots, I create a variable in the form `Author YYYY`.
+Create a proper label in the form `Author YYYY`.
 
 ```{r study ID}
 temp$untidy_data <-  
@@ -70,7 +69,9 @@ temp$untidy_data <-
          study = stringr::str_to_title(study))
 ```
 
-Re-code study design under three categories, create a new variable that specifies those studies that used registry data and create an indicator variable for registry_reports
+- Re-code study design under three categories.
+- Create a new variable that specifies studies that used registry data 
+- Create an indicator variable for registry_reports
 
 ```{r wrangle study type}
 table(temp$untidy_data$study_design)
@@ -140,13 +141,13 @@ temp$untidy_data <-
                 )) 
 ```
 
-## Defining overall Risk of bias assessment
+### Defining overall Risk of bias assessment
 
 To conduct a sensitivity analysis based on overall risk of bias, we created the following definitions based on the author's considerations of the most important domains in quality appraisal:
 
-+ **Low risk** requires _low risk in all of_ sampling frame, sampling scheme, sample size, population description and statistical calculation. Also, _must not be high risk_ in standardized outcome measurement.
++ **Low risk requires _low risk_ in all of ** sampling frame, sampling scheme, sample size, population description and statistical calculation. Also, _must not be high risk_ in standardized outcome measurement.
 
-+ **High risk** when qualified as _high risk in any_ of sampling frame, sampling scheme, sampling size,  population description, identification methods or statistical calculation
++ **High risk requires _high risk_ in any of **  sampling frame, sampling scheme, sampling size,  population description, identification methods or statistical calculation
 
 + **Unclear** for remaining ones
 
@@ -174,7 +175,6 @@ temp$untidy_data <-
 ```
 
 The last step in data wrangling is to change all character variables into factors. 
-
 ```{r}
 clean_data <-  
   temp$untidy_data %>%
@@ -182,202 +182,100 @@ clean_data <-
 
 ```
 
-# Exploratory data analysis 
 
 ## Wrapper functions
 
-__count_wrapper__ counts and produces a kable formatted table
-__formatted_kable__ contains the styling steps to produce an html formatted table, requires a data input 
+### Wrapper: proportions and tables
+
++ __count_table__ counts and produces a kable formatted table 
++ __formatted_kable__ contains the styling steps to produce an html formatted table, requires a data input 
++ __count_prop__ produces counts and proportions, no kable
 
 ```{r kable wrapper}
-count_table <- function(data, var) {
-  count(data, {{var}}) %>%
+
+count_table <- function(data, 
+                        var,
+                        digits = 2,
+                        fontsize = 18) {
+  
+  # count data
+  df <- count(data, {{var}}) %>%
     mutate(prop = prop.table(n)*100,
-           prop = round(prop, 1)) %>%
-    kbl(format="html", 
-        align = c("lcc"), 
-        digits = 2, 
-        booktabs = T) %>%
-    kable_styling(font_size = 25, 
-                  bootstrap_options = "striped") %>% 
-    kable_classic(full_width = F)
+           prop = round(prop, 1))
+  
+  # produce formatted flextable
+  tab <- flextable(df)
+  tab <- tab %>% 
+    theme_zebra() %>%
+    colformat_double(decimal.mark = ".", digits = digits)
+  tab <- tab %>% 
+    fontsize(size = fontsize, part = "all") %>% 
+    align(j = -1, align = "center", part = "all") %>%
+    autofit()
+  tab
 }
 
-formatted_kable <- function(data, names=colnames(data)) {
-  kbl(x=data, format="html", 
-      align = c("lccccccccc"), 
-      digits=2, 
-      col.names = names) %>%
-    kable_styling(font_size = 25, 
-                  bootstrap_options = "striped") %>% 
-    kable_classic(full_width = F)
+
+# ------------------------------------------------
+count_prop =  function (data, var) {
+  df <-  data
+  df %>% 
+    count({{var}}) %>% 
+    mutate(freq = n / sum(n)) %>% 
+    # round and transform to percentage
+    mutate(freq = freq * 100,
+           freq = round(freq, 2))}
+
+# -------------------------------------------------
+flextable_wrapper <- function(data,
+                              fontsize = 14,
+                              digits = 3,
+                              names_col = colnames(data)){
+  # ---------- sanity checks
+  
+    if (!is.data.frame(data))   warning("data must be data.frame like!")
+    if (!is.vector(names_col)) stop("names_col must be a character vector!")
+ 
+  # ---------- programming
+  
+  df <- data
+  colnames(df) <-  names_col
+  tab <- flextable(df)
+  tab <- tab %>% 
+    theme_zebra() %>%
+    colformat_double(decimal.mark = ".", digits = digits)
+  tab <- tab %>% 
+    fontsize(size = fontsize, part = "all") %>% 
+    align(j = -1, align = "center", part = "all") %>%
+    autofit()
+  tab
 }
-```
 
-- How many studies reported individual species data to calculate prevalence of MAC or MABs?
-
-```{r}
-clean_data %>% 
-  count_table(is.na(mabs_infection))
-
-clean_data %>% 
-  count_table(is.na(avium_infection))
-```
-
-
-- How many studies are registry reports? 
-- How many studies include pediatric, mixed or adult population ?  
-
-```{r study types}
-count_table(clean_data, study_design)
-
-count_table(clean_data, age_group) 
-
-# Excluding registry reports
-filter(clean_data, is_registry==0) %>% 
-  count_table(., age_group)
-```
-
-_ In what region where most of the studies conducted?
-
-```{r region}
-count_table(clean_data, region)
-```
-
-- Summarize the first year of data in the studies 
-- What is the range of data_years included in the studies? 
-
-```{r first year of data}
-
-quantile(clean_data$first_year_data, na.rm = T) %>% data.frame(Quantiles=.) %>% 
-  formatted_kable() 
-
-ggplot(clean_data, aes(y=first_year_data, x=0)) +
-  geom_boxplot(width=1.3, outlier.shape =NA) +
-  geom_jitter(width = 0.2, color="grey37") +
-  labs(title= "First year of data collected in study",
-       subtitle = "All studies",
-       y="") +
-  theme_classic()+
-  xlim(-1,1) +
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        plot.title = element_text(hjust=0.5),
-        plot.subtitle = element_text(colour="red4"))
-
-# excluding registry reports 
-clean_data %>% 
-  filter(is_registry==0) %>% 
-  summarize(
-    mean_year=mean(first_year_data, na.rm=T),
-    sd=sd(first_year_data, na.rm=T),
-    quantile_years= quantile(first_year_data, na.rm = T)
-    ) %>% 
-  formatted_kable()
-
-clean_data %>% 
-  filter(is_registry==0) %>% 
-  ggplot(aes(y=first_year_data, x=0)) +
-  stat_boxplot(geom = "errorbar", width=0.3) +
-  geom_boxplot(width=1.3, outlier.shape =NA) +
-  geom_jitter(width = 0.2, color="grey37") +
-  labs(title= "First year of data collected in study",
-       subtitle = "Excludes registry studies",
-       y="") +
-  theme_classic()+
-  xlim(-1,1) +
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        plot.title = element_text(hjust=0.5, size=16),
-        plot.subtitle = element_text(colour="red4", size=14))
-```
-
-- How many were conducted before 2010 and 2000?
-    + We use the 5-year groups we previously defined to summarize this data. Before plotting, we organize in increasing order the factor variable.
-
-```{r barplot by date range}
-
-filter(clean_data, is_registry==0) %>%
-  count_table(., before_year)
-
-# relevel before_year factor
-clean_data$before_year<- 
-  factor(clean_data$before_year, levels = c("2000 or before","2001-2004","2005-2009","2010-2014","2015 or after")) 
-
-clean_data %>% 
-  filter(is_registry==0) %>%
-  ggplot(aes(x=before_year, fill=factor(before_year)))+
-  geom_bar() +
-  labs(title= "Frequency of studies by date of data collection",
-       subtitle = "No registry reports",
-       x= "",
-       y="") +
-  scale_fill_brewer(palette = "Blues") +
-  theme_classic()+
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5, size=16),
-        plot.subtitle = element_text(color="red4", size=14),
-        axis.text = element_text(size=12)) 
-```
-
-- What is the median sample size of the non-registry studies?
-    + Does this change according to the year of data collection?
-
-```{r sample size}
-## for registry reports or registry based studies
-clean_data %>% 
-  filter(is_registry==1 | used_registry=="yes") %>% 
-  summarize(
-  SampleSize_quantiles=quantile(sample_size_cf, na.rm=T)) %>% 
-  formatted_kable()
-
-# observational studies
-clean_data %>% 
-  filter(is_registry==0 & used_registry=="no") %>% 
-  summarize(
-  sample_size_quantiles=quantile(sample_size_cf, na.rm=T)) %>%
-  formatted_kable()
-
-clean_data %>% 
-  filter(is_registry==0 & used_registry=="no") %>% 
-  ggplot(aes(y=sample_size_cf, x=first_year_data)) +
-  geom_point(size=2) +
-  labs (title="Sample size according to year of data",
-       subtitle="No registry reports",
-       x="First year of data collection",
-       y="CF sample size (log10 scale)") +
-  scale_y_continuous(trans="log10") +
-  theme(plot.subtitle = element_text(color="red4", size = 14),
-        plot.title = element_text(size=16, hjust=0.5),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=12)) 
 ```
 
 
 ### Wrapper: meta-analysis 
 
 __metaprop_formatted__ wraps the `meta::metaprop` function with options 
- - `sm=PLOGIT` specifies to use the logit transformation for the proportions
- - `hakn=TRUE` applies an adjustment for more conservative confidence intervals
- - `comb.random=T` specified a random effects model
- - `method="GLMM"` recommended over inverse variance for proportions
- - `n=sample_size_cf` specified the variable with sample size
- - `event=all_ntm_infection` calls the number of events
+
+- `sm=PLOGIT` specifies to use the logit transformation for the proportions
+- `hakn=TRUE` applies an adjustment for more conservative confidence intervals
+- `comb.random=T` specified a random effects model
+- `method="GLMM"` recommended over inverse variance for proportions
+- `n=sample_size_cf` specified the variable with sample size
+- `event=all_ntm_infection` calls the number of events
 
 ```{r formatted meta.prop function}
-metaprop_formatted <- function (data=data, fixed=F){
-  metaprop(
-    data=data,
-    event = all_ntm_infection,
-    n = sample_size_cf,
-    studlab = study,
-    method = "GLMM",
-    sm = "PLOGIT",
-    random = TRUE,
-    fixed=fixed,
-    hakn = TRUE)
+metaprop_formatted <- function (data = data, fixed = F){
+  metaprop(data = data,
+           event = ntm_point_infection,
+           n = sample_size_cf,
+           studlab = study,
+           method = "GLMM",
+           sm = "PLOGIT",
+           random = TRUE,
+           fixed = fixed,
+           hakn = TRUE)
 }
 ```
 
@@ -422,38 +320,240 @@ forest_wrapper <- function(data,
               xlab = xlab,
               xlim=xlim,
               addrows.below.overall = 1,
-              subgroup.name = subgroup.name
-  )
-}
+              subgroup.name = subgroup.name)
+  }
 # forest_wrapper(meta.full)
 
 ```
 
+# Exploratory data analysis 
 
-
-## How many studies report every outcome
+## Exploratory: outcomes reported
 
 The dataset includes only raw numbers, percentages without raw numbers were not included. 
 
-- **NTM disease**
-    + Period prevalence = 13
-    + Point prevalence = 2
-- **NTM infection**
-    + Incidence proportion = 4
-    + Point prevalence = 56
-    + Period prevalence = 43
+- **NTM disease** period prevalence = 15 
+- **NTM disease** point prevalence = 2
+- **NTM infection** period prevalence = 50 (15 not reporting point/annual prevalence)
+
+- **NTM infection** point/annual prevalence = 68 (including those only reporting %)
+- **NTM infection** incidence proportion = 4
 
 ```{r}
+# point/annual prevalence
 clean_data %>% 
-  filter(!is.na(all_ntm_infection)) %>%
-  mutate(point=case_when(last_year_data - first_year_data < 2 ~ "yes",
-                         TRUE ~ "no" )) %>%
-  count_table(point)
+  # include also those with only percentage reported
+  filter(point_infection_ind == "yes" | annual_period_ind =="yes") %>% 
+  # 57 report point_infection and remaining 11 annual period_infection
+  count(point_infection_ind, annual_period_ind)
+
+# other outcomes
+clean_data %>% count_prop(period_disease_ind)
+clean_data %>% count_prop(period_infection_ind)
+  # excluding those that reported annual/point prevalence 
+clean_data %>% 
+  filter(period_infection_ind == "yes" &  point_infection_ind == "no") %>% 
+  count(period_infection_ind)
+clean_data %>%  count_prop(point_disease_ind)
+
+# specific NTM species
+clean_data %>% count_prop(is.na(mabs_infection))
+clean_data %>% count_prop(is.na(avium_infection))
+```
+
+## Exploratory: study design, region, age
+
+```{r}
+# study design 
+count_prop(clean_data, study_design)
+
+# merging registry reports/used registry 
+count_prop(clean_data, design_or_registry)
+
+# region
+count_prop(clean_data, region1)
+
+clean_data  %>%
+  count_table(region1)
+
+# age group
+clean_data  %>%
+  count_table(age_group)
+```
+
+## Exploratory: years of data collection 
+
+```{r}
+# relevel before_year factor
+clean_data$before_year<- factor(clean_data$before_year, 
+                                levels = c("2000 or before", "2001-2004", "2005-2009", 
+                                           "2010-2014", "2015 or after")) 
+
+# plot year of data vs sample size, facet by registry
+clean_data %>% 
+  ggplot(aes(x = first_year_data, y = sample_size_cf)) +
+  geom_point() + 
+  facet_wrap( ~ is_registry)
+
+# explore years of data collection
+clean_data$first_year_data %>%  summary()
+clean_data  %>%  count_table(before_year)
+
+# barplot of data collection
+clean_data %>% 
+  filter(is_registry==0) %>%
+  ggplot(aes(x=before_year, fill=factor(before_year)))+
+  geom_bar() +
+  labs(title= "Frequency of studies by date of data collection",
+       subtitle = "No registry reports",
+       x= "",
+       y="") +
+  scale_fill_brewer(palette = "Blues") +
+  theme_classic()+
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5, size=16),
+        plot.subtitle = element_text(color="red4", size=14),
+        axis.text = element_text(size=12),
+        axis.text.x = element_text(angle = 45, vjust = 0.6))
+```
+
+## Exploratory: sample size
+
+```{r}
+# sample size not normal
+clean_data %>% 
+  group_by(is_registry) %>% 
+  summarise(normal = shapiro.test(sample_size_cf)$p.value)
+
+# sample size registry reports
+clean_data %>%
+  filter(study_design=="Registry report") %>% 
+  summarise(median = median(sample_size_cf),
+            min = min(sample_size_cf),
+            max = max(sample_size_cf))
+
+# sample size observational not using registry data
+clean_data %>%
+  filter(design_or_registry!="Registry report/used registry") %>% 
+  summarise(median = median(sample_size_cf),
+            min = min(sample_size_cf),
+            max = max(sample_size_cf))
+
+# plot sample size vs year data collection, non-registry
+clean_data %>%
+  filter(design_or_registry != "Registry report/used registry") %>%
+  ggplot(aes(y = sample_size_cf, 
+             x = first_year_data)) +
+  geom_point(size = 2) +
+  labs (title = "Sample size according to year of data",
+        subtitle = "Observational studies, non-registry data",
+        x = "First year of data collection",
+        y = "CF sample size") +
+  scale_y_continuous(trans = "log10") +
+  theme(plot.subtitle = element_text(color = "red4", size = 14),
+        plot.title = element_text(size = 16, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12)) 
+```
+
+## Exploratory: infection period prevalence
+
+We will summarize:
+* number of studies reporting period prevalence
+* regions were they come from
+* length of study period
+
+```{r}
+count(clean_data, period_infection_ind, period_disease_ind) 
+      
+temp$period_infection <- 
+  clean_data %>% 
+  filter(period_infection_ind=="yes") %>% 
+  # new variable with calculated and provided percentages
+  mutate(estimate = case_when( is.na(period_inf_perc) ~ (inf_events_period / sample_size_period ) * 100,
+                               TRUE ~ period_inf_perc))
+
+# region
+temp$period_infection %>%  
+  count_prop(region1)
+
+# population
+temp$period_infection %>% 
+  count_prop(age_group)
+
+#study-design
+temp$period_infection %>% 
+  count_prop(design_or_registry)
+
+# study_period length
+temp$period_infection %>% 
+  count(study_length = last_year_data - first_year_data + 1) %>%
+  mutate(freq = n * 100 / 35) %>%
+  ggplot(aes(x = study_length,
+             y = n,
+             label = round(freq, 2))) +
+  geom_col() +
+  geom_label(nudge_y = 1) +
+  scale_x_continuous(breaks = 1:14) +
+  scale_y_continuous(breaks = 0:15)
+  
+# plot period prevalence values
+temp$period_infection %>%
+  ggplot(data = .,
+         aes(x = 0, y = estimate)) +
+  geom_boxplot(outlier.shape = NA, width = 1) +
+  geom_jitter(width = 0.1) +
+  xlim(-1.5, 1.5)
+
+# sample_size
+temp$period_infection %>% 
+  select(sample_size_period, study) %>% 
+  head()
+
+temp$period_infection %>% 
+  pull(sample_size_period) %>% 
+  summary()
+
+# distribution of prevalence estimates
+temp$period_infection %>%
+  count(estimate) %>%
+  summary()
+
+# view results according to study and time-interval
+temp$period_infection %>%
+  mutate(study_length = last_year_data - first_year_data + 1) %>% 
+    select(study, study_length, estimate, 
+           inf_events_period, sample_size_period) %>% 
+  head()
+
+# overall risk of bias  
+temp$period_infection %>% 
+  count_table(Overall_risk)
+```
+
+## Exploratory: NTM disease 
+
+
+```{r}
+temp$period_disease <-
+  clean_data %>%
+  filter(period_disease_ind == "yes") %>%
+  mutate(interval_years = last_year_data - first_year_data + 1)
+
+temp$period_disease %>% count_prop(region1)
+temp$period_disease %>% select(sample_size_cf, study) 
+temp$period_disease %>% select(interval_years, study) 
+temp$period_disease %>% count_prop(study_design) 
+temp$period_disease %>% count_prop(country) 
+
+clean_data %>% 
+  filter(point_disease_ind=="yes")
+
 ```
 
 # Meta analysis of NTM infection point (annual) prevalence
 
-## All studies meta-analysis
+## Meta-analysis: all studies
 
 * Meta-analysis will be conducted only for point prevalence of NTM infection
     - `all_ntm_infection` which contains the number of events
@@ -463,9 +563,11 @@ clean_data %>%
 ```{r}
 inf_point_data <-  
   clean_data %>% 
-  filter (!is.na(all_ntm_infection) &
-           last_year_data - first_year_data < 2) 
-# n= 57
+  # select point_infection or annual_period studies
+  filter(point_infection_ind == "yes" | annual_period_ind =="yes") %>% 
+  # drop_na
+  drop_na(ntm_point_infection)
+# n= 59
 ```
 
 In a meta-analysis including all studies, there is high heterogeneity. All observations cannot be plotted.  
@@ -483,11 +585,6 @@ To produce subgroups we update `full.meta` according to a variable and then pass
 # Subgroup test is significant but not relevant change (98.3 vs 99.7)
 update.meta(meta.full,
             subgroup = is_registry,
-            tau.common = F)
-
-# reduced heterogeneity according to study design, lower in cohort and cross sectional studies (82% & 91%) compared to registries (99.7%)
-update.meta(meta.full,
-            subgroup = design_or_registry,
             tau.common = F)
 
 # forest plot for subgroup analysis by study_design
@@ -513,16 +610,18 @@ inf_point_data %>%
 
 ```
 
-### Separated forest plots for registry studies and observational studies
+Separated forest plots for registry studies and observational studies
 
 ```{r}
-# forest plots of registry studies with raw numbers
-inf_point_data %>% 
-  filter (is_registry==1) %>% 
-  metaprop_formatted(data=.) %>% 
-  forest_wrapper(data=., stu.res = T, xlim = c(0,0.3))
+# forest plots of registry studies with raw numbers (numerator/denominator)
+inf_point_data %>%
+  filter (is_registry == 1) %>%
+  metaprop_formatted(data = .) %>%
+  forest_wrapper(data = .,
+                 stu.res = T,
+                 xlim = c(0, 0.3))
 
-# * Only observational studies that did not use registry data
+# only observational studies that did not use registry data
 inf_point_data %>%
   filter (is_registry == 0) %>%
   metaprop_formatted(data = .) %>%
@@ -537,18 +636,18 @@ inf_point_data %>%
 
 ```{r}
 update.meta(meta.full,
-            subgroup = before_year, 
+            subgroup = before_year,
             tau.common = F) %>%
-  forest_wrapper(data=., 
-                 pred_int = F, 
-                 xlim=c(0,1), 
-                 subgroup.name="First year of data collection")
+  forest_wrapper(data = .,
+                 pred_int = F,
+                 xlim = c(0, 1),
+                 subgroup.name = "First year of data collection")
 
 ```
 
 We see reduced heterogeneity in the groups before 2000, 2001 - 2004 and 2005 - 2009. This difference is statistically significant. 
 
-## Subgroup by regions (continents)
+## Subgroup: regions (continents)
 
 Others includes studies in Latin-America, Australia, Middle-East and Africa. 
 
@@ -556,107 +655,107 @@ Others includes studies in Latin-America, Australia, Middle-East and Africa.
 update.meta(meta.full,
             subgroup =  region1, 
             tau.common = F) %>% 
-  forest_wrapper(data=., 
-                 subgroup.name ="Region", 
-                 pred_int = T, 
-                 xlim = c(0,0.5))
+  forest_wrapper(data = .,
+                 subgroup.name = "Region",
+                 pred_int = T,
+                 xlim = c(0, 0.5))
     
 ```
 
 There is a significant difference in the effect estimates among the groups, but heterogeneity remains high in all (>95%)
 
-## Subgroup by age 
-
-Not performed because more than 80% of the studies have a mixed (pediatric+adult) and more granular data could not be retrieved. 
+**Subgroup: age**  was not performed because most studies (> 80%) had mixed (pediatric + adult) populations.  
 
 # Additional analyses
 
-## Meta-regression: including multiple moderators 
+## Pre-specified: Meta-regression 
 
 We use `metafor::rma.uni` function to fit the meta-analyses and indicate the moderators (grouping variables) to be used. 
 
-Syntax options for moderators:
- - mods = cbind (mod1,mod2,mod3)
- - mods= ~ mod1 + mod2 + mod3
+1. Prepare the variables levels for evaluation in meta-regression. 
 
-
-1. Calculate the effect size (proportions) using `escalc()` 
-    + Reorder and format covariates
-    + Our units are Logit-proportions **"PLO"** 
-        ++ Better statistical properties _(Schwarzer 2019)_
-    + All covariates are inside the `inf_point_data` object
 
 ```{r calculate proportion effect size}
 # change reference level in factors
-inf_point_data <- 
+metareg_data <- 
   inf_point_data %>% 
-  mutate(region1=relevel(region1, ref="NAM"),
-         before_year=relevel(before_year, ref="2015 or after"),
-         study_design=relevel(study_design, ref="Registry report")) 
-
-
-inf_point_escalc <-
-  inf_point_data  %>% 
-  escalc(data = .,
-         xi=all_ntm_infection, # number of events
-         ni=sample_size_cf,  # sample size
-         measure="PLO")
+  mutate(region1 = relevel(region1, ref = "NAM"),
+         before_year = relevel(before_year, ref = "2015 or after"),
+         study_design = relevel(study_design, ref = "Registry report"),
+         sample_size_cat = case_when(sample_size_cf < 300 ~ "small", 
+                                     TRUE ~ "large"),
+         sample_size_cat = factor(sample_size_cat, levels = c("small", "large")),
+         age_group =  factor(age_group, levels = c("mixed", "pediatric", "adult")))
 ```
 
-2. Validate results between `meta` and `metafor`by fitting general meta-analysis
-    + slab = study label
-    + yi and vi are effect measures calculated by `escalc()`
-    + method = REML
+2. We will use Logit transformation (`PLO`) to optimize the properties of the generalized linear model as recommended by __(Schwarzer 2019)__
+    * Beforehand, we verify concordance between `meta` and `metafor` packages
+    * Model with all pre-specified predictors failed to converge, the best prediction was obtained using `sample_size_cat`. Other covariates are included as pre-specified.
 
-```{r metafor all studies MA}
+```{r metafor review and metaregression}
 metafor.full <- 
-  rma.uni(yi = yi, 
-          vi = vi, 
-          slab = id,
-          data = inf_point_escalc,
-          test = "knha",
-          method = "REML")
+  rma.glmm(xi = ntm_point_infection,
+           ni = sample_size_cf,
+           slab = id,
+           data = metareg_data,
+           method = "ML",
+           measure = "PLO")
+
 
 meta.full$TE.random %>% transf.ilogit()
 coef(metafor.full) %>% transf.ilogit()
 
 # provides roughly the same results
-```
 
-3. Fit a meta-regression model to evaluate the heterogeneity according to our pre-specified subgroups
-
-```{r meta-regression}
-
+# ------------------- Meta regression
 metareg <- 
-  rma.uni(yi = yi, 
-          vi = vi,
-          mods= ~ region1 + before_year + study_design +study_design*region1, 
-          slab = id,
-          data = inf_point_escalc,
-          test = "knha",
-          method = "REML")
+  rma.glmm(xi = ntm_point_infection,
+           ni = sample_size_cf,
+           slab = id,
+           data = metareg_data,
+           method = "ML",
+           measure = "PLO",
+           # random effects model
+           model = "UM.RS",
+           mods= ~ design_or_registry + sample_size_cat + region1,
+           control = list(optimizer = 'bobyqa', optCtrl=list(iter.max=10000, rel.tol=1e-12)))
+
 
 # create vector with formatted names for coefficients
-temp$coef.names <- c("Intercept", "Region:EUR", "Region:other", "2000 or before",
-                     "2001-2004", "2005-2009", "2010-2014",
-                     "Design:cross-sectional", "Design:cohort",
-                     "EUR*Cross.sectional", "Other*Cross.sectional", 
-                     "EUR*Cohort", "Other*Cohort")
+temp$coef.names <- c("Intercept", "Design: cohort study", 
+                     "Design: cross-sectional study", 
+                     "Large sample size (> 300)",
+                     "European region", "Other regions")
 
-# backtransform LOGIT proportions and produce table
-summary(metareg) %>% 
-  coef() %>% 
-  mutate(Coefs=temp$coef.names,.before=1) %>%
-  remove_rownames() %>% 
+
+
+# ----------------flextable
+
+# produce table
+summary(metareg) %>%
+  coef() %>%
+  mutate(Coefs = temp$coef.names, .before = 1,
+         zval = NULL) %>%
   # specify names of columns
-  formatted_kable(names=c("Coefficients", "LOGIT-estimate", "std.error", 
-                          "t-value", "df", "p.value", "CI-lower", "CI-upper")) %>%
-  # bold significant rows
-  row_spec(row=c(2,3,6,7,11,13), bold=T) %>% 
-  kable_styling(font_size = 18)
+  flextable_wrapper(names_col = c("Coefficients",  "LOGIT-estimate", "Std. error",
+                                  "p.value", "CI-lower", "CI-upper"),
+                    digits = 4) %>% 
+  bold(i= ~ p.value <0.05 & Coefficients!="Intercept", part = "body")
+
+
+# --------- estimates calculation
+# baseline
+transf.ilogit(-1.589)
+# large sample size
+transf.ilogit(-1.589 - 0.9305)
+# europe
+transf.ilogit(-1.589 - 0.9631)
+# other regions
+transf.ilogit(-1.589 - 2.0525)
+
 ```
 
-## Exploratory: multilevel model
+## Unspecified: multilevel model
 
 We explored inner collinerarity among registry studies in a multi-level meta-analysis with studies nested according to registry data they used
 
@@ -668,10 +767,14 @@ We explored inner collinerarity among registry studies in a multi-level meta-ana
 # table(inf_point_data$used_registry)
 
 multilvl.meta <- 
+  escalc(xi = ntm_point_infection, 
+         ni = sample_size_cf,
+         data = inf_point_data,
+         measure = "PLO") %>% 
   rma.mv(yi = yi, 
          V = vi,
          slab = id,
-         data = inf_point_escalc,
+         data = .,
          random = ~ 1 | used_registry/id,
          test = "t",
          method = "REML")
@@ -680,10 +783,10 @@ multilvl.meta <-
 data.frame(Estimate=transf.ilogit(multilvl.meta$beta),
            Lower_CI=transf.ilogit(multilvl.meta$ci.lb),
            Upper_CI=transf.ilogit(multilvl.meta$ci.ub)) %>% 
-  formatted_kable()
+  flextable_wrapper()
 
 summary(multilvl.meta)
-transf.ilogit(-3.2488)
+transf.ilogit(-3.3392)
 ```
 
 What percentage of the variance is explained by level of our hierarchical model. Level 3 groups according to registry. 
@@ -692,111 +795,78 @@ What percentage of the variance is explained by level of our hierarchical model.
 var.comp(multilvl.meta)$results %>%
   mutate(Vars = c("Individual level", "Study/registry", "Registry"),
          n_groups = c("--", "73", "6"),
-         .before = 1) %>%
-  formatted_kable(names = c("", "n", "% of total variance", "$I^2$")) %>%
-  row_spec(row = 0, bold = T) %>%
-  kable_styling(font_size = 24)
+         .before = 1) %>% 
+  flextable_wrapper(names_col = c(" ", "n", "% of total variance", "Heterogeneity (I2)")) 
+
 ```
 
-## Exploratory: subgroup by overall quality
+## Unspecified: subgroup by overall quality
 
 Low risk of bias studies have narrow prediction interval. 
 
 ```{r}
 table(inf_point_data$Overall_risk)
 
+# significant difference according to overall RoB appraisal. 
 update.meta(meta.full,
             subgroup =  Overall_risk, 
             tau.common = F)
-# significant difference according to overall RoB appraisal. 
 
+#  forest plot according to overall RoB
 update.meta(meta.full,
             subgroup = Overall_risk, 
             tau.common = F) %>%
   forest_wrapper(subgroup.name = "Overall Risk of Bias (JBI)")
-#  forest plot according to overall RoB
 
+
+# plot of only low RoB studies
 inf_point_data %>% 
   filter(Overall_risk=="Low") %>%
   metaprop_formatted(data=.) %>% 
   forest_wrapper(stu.res = T, xlim = c(0,0.3), sort.var = .$stulab)
-# plot of only low RoB studies
+
+# same plot sorted by publication date
+inf_point_data %>% 
+  filter(Overall_risk=="Low") %>%
+  metaprop_formatted(data=.) %>% 
+  forest_wrapper(stu.res = T, xlim = c(0,0.3), 
+                 sort.var = .$data$publication_date)
   
 ```
 
-# Complementary analyses for meta-analysis
+# Publication bias
 
-## Publication bias (funnel plot)
+## Funnel plots
 
-For the meta-analysis of all studies (contour-enhanced funnel plot). There is asymmetry by Egger's test. 
-
-```{r all studies funnel plot and egger's test}
-funnel(x=metafor.full,
-       xlab="Logit transformed proportions",
-       level=c(90, 95, 99), 
-       shade=c("white", "gray55", "gray75"),
-       legend="topleft", 
-       atransf = transf.ilogit)
-
-regtest(metafor.full,
-        model = "rma",
-        predictor = "sei",
-        ret.fit = T)
-
-# for the metaregression 
-regtest(metareg,
-        model = "rma",
-        predictor = "sei",
-        ret.fit = T)
-
-```
-
-There is a significant p_value including all studies, and  we can see an asymmetry at the lower left side (low SE and small estimate). If we remove Brazilian registry reports, it disappears.
-
-```{r excluding Brazil registry (funnel & egger's test)}
-
-temp$maetafor_not_brazil <- 
-inf_point_data  %>% 
-  filter(used_registry!="Brazil") %>% 
-  escalc(data = .,
-         xi=all_ntm_infection, # number of events
-         ni=sample_size_cf,  # sample size
-         measure="PLO") %>%
-  rma.uni(yi = yi,
-          vi = vi,
-          slab = id,
-          data = .,
-          test = "knha",
-          method = "REML")
-
-
-funnel(x=temp$maetafor_not_brazil,
-       xlab="Logit transformed proportions",
-       level=c(90, 95, 99), 
-       shade=c("white", "gray55", "gray75"),
-       legend="topleft", 
-       atransf = transf.ilogit)
-
-regtest(temp$maetafor_not_brazil,
-        model = "rma",
-        predictor = "sei",
-        ret.fit = T)
-```
-
-
-## Publication bias (Trim & Fill method)
-
-The trim and fill method detects places of asymmetry in the funnel plot and inputs studies to achieve a more balanced estimation. It is used to quantify the degree of small studies bias in our results. 
+For the meta-analysis of all studies, we see some asymmetry in the funnel plot `~ sample size`. However, no appropriate test for publication bias is available for prevalence meta-analysis. The asymmetry is due to the reports from the US. 
 
 ```{r}
-trimfill(metafor.full)
 
-# backtransform logit to proportion
-transf.ilogit( -3.1667)
+funnel(x = metafor.full,
+       yaxis = "ni",
+       xlab="Logit transformed proportions",
+       level = 95,
+       atransf = transf.ilogit,
+       col = "darkblue") 
+
+metareg_data$used_registry
+
+# excluding US registry reports
+rma.glmm(xi = ntm_point_infection,
+         ni = sample_size_cf,
+         slab = id,
+         data = metareg_data,
+         method = "ML",
+         measure = "PLO",
+         subset = used_registry!="US") %>% 
+  funnel(x = .,
+         yaxis = "ni",
+         xlab="Logit transformed proportions",
+         level = 95,
+         atransf = transf.ilogit,
+         col = "darkblue")  
+
 ```
-
-No study was imputed using these method and the estimate did not change at all. 
-
 
 # Risk of bias appraissal
 
@@ -818,18 +888,27 @@ First, we select only the variables that contain quality assessment data and tra
 ```{r}
 rob_data <- 
   clean_data %>% 
-  select(study, matches("Q[0-9]"), Overall_risk, study_design, 
-         before_year, period_disease, period_prevalence) %>% 
+  # match to select RoB questions and outcome_indicator variables
+  select(study, matches("Q[0-9]|ind"), Overall_risk, study_design,
+         before_year) %>% 
   rename(ROB_overall=Overall_risk) %>% 
   as.data.frame() 
+```
+
+## Exploratory: unclear proportion
+
+```{r}
+count_prop(rob_data, Q6_Identification_methods)
+count_prop(rob_data, Q7_Standardized_measurement)
+count_prop(rob_data, Q9_Response_rate)
 ```
 
 ## Summary plots
 
 Now, we produce both plots summary tables using the rob.summary function from the `dmetar` package
 
-* The function had a minor issue with the matching of the legend so I correct it in the source code as rob.summary2
- - All credit to authors, I will just use it locally
+* I corrected small issue in `robvis` function and added it as rob.summary2
+* All credit to authors, I will just use it locally
 
 ```{r rob.summary2}
 rob.summary2 = function(data,
@@ -1130,7 +1209,6 @@ rob.summary2 = function(data,
 
 ```
 
-
 All studies inside the summary
 
 ```{r}
@@ -1148,6 +1226,7 @@ rob_data %>%
 Registry studies vs others
 
 ```{r}
+# registry
 rob_data %>%
   filter(study_design=="Registry report") %>% 
   select(-ROB_overall) %>% 
@@ -1158,6 +1237,7 @@ rob_data %>%
               name.missing ="Missing",
               studies=.$study)
 
+# non-registry
 rob_data %>%
   filter(study_design!="Registry report") %>% 
   select(-ROB_overall) %>% 
@@ -1170,12 +1250,10 @@ rob_data %>%
 
 ```
 
-## Traffic light plots
+## Traffic: registry studies
 
-We summarize as subgroups to avoid crowding in the plot, so I produce first traffic plots for all registry reports. 
-
-* Using the `delete_layers()` I remove automatically generated layers so they are not seen in the background
-* Then, I add the table layout, color squares and text to produce the traffic light
+* With `delete_layers()`, we remove automatically generated layers
+* Then, we add the table tiles, color squares and text to produce the traffic light
 
 ```{r}
 
@@ -1208,112 +1286,49 @@ ggpubr::ggarrange(plotlist = traffic_plots)
 
 ```
 
-Let us plot the risk of bias for the studies that report incidence of NTM infection
+## Traffic: incidence and NTM disease
+
+Traffic light plot for studies reporting incidence of NTM infection
 
 ```{r}
 rob_data %>% 
-  filter(grepl("Bar-On|Campos|Hatziag|Leitr", study)) %>% 
+  filter(incidence_ind=="yes") %>% 
   select(-ROB_overall) %>% 
   rob.summary2(table = T,
                studies=.$study) %>% 
   delete_layers(idx = 1:3) +
   geom_tile(color = "black", fill = "white", size = 0.7) +
-  geom_point(aes(color=as.factor(measurement)), size=15, shape=15) +
-  geom_text(aes(label = measurement), size = 6) +
+  geom_point(aes(color=as.factor(measurement)),
+             size=15, 
+             shape=15) +
+  geom_text(aes(label = measurement), 
+            size = 6) +
   theme(axis.text.x = element_text(size=10),
         axis.text.y = element_text(size=10))
 ```
 
-Finally, for the 9 studies that reported NTM disease period prevalence and the 2 studies reporting point prevalence, I also produce a traffic light plot.
+Finally, for studies reporting NTM disease period prevalence (n = 9) or point (n = 2) prevalence, I also produce a traffic light plot.
 
 ```{r}
 rob_data %>%
-  filter(period_disease=="yes" | grepl("Radhakrish|Bar-On", study)) %>% 
+  filter(period_disease_ind =="yes" | point_disease_ind=="yes") %>% 
   select(-ROB_overall) %>% 
   rob.summary2(table = T,
                studies=.$study) %>% 
   delete_layers(idx = 1:3) +
-  geom_tile(color = "black", fill = "white", size = 0.7) +
-  geom_point(aes(color=as.factor(measurement)), size=8, shape=15) +
-  geom_text(aes(label = measurement), size = 5) +
-  theme(axis.text.x = element_text(size=10),
-        axis.text.y = element_text(size=10)) +
-  coord_flip()
+  geom_tile(color = "black",
+            fill = "white", 
+            size = 0.7) +
+  geom_point(aes(color=as.factor(measurement)),
+             size=12,
+             shape=15) +
+  geom_text(aes(label = measurement),
+            size = 7) +
+  theme(axis.text.x = element_text(size=13),
+        axis.text.y = element_text(size=13))
+# adjust to plot space
 ```
 
-
-# Exploration of period prevalence
-
-## For infection
-
-We will summarize:
-* number of studies reporting period prevalence
-* regions were they come from
-* length of study period
-
-```{r}
-count(clean_data, 
-      period_prevalence, period_disease)
-
-temp$period_infection <- 
-  clean_data %>% 
-  filter(period_prevalence=="yes")
-
-# region
-temp$period_infection %>%  
-  count_table(region1)
-# population
-temp$period_infection %>% 
-  count_table(age_group)
-#study-design
-temp$period_infection %>% 
-  count_table(study_design)
-# study_period length
-temp$period_infection %>% 
-  mutate(study_length=last_year_data-first_year_data+1) %>% 
-  count(study_length) %>% 
-  mutate(freq=n*100/35)
-# plot period prevalence values
-temp$period_infection %>% 
-  mutate(pp=all_ntm_infection/sample_size_cf*100) %>% 
-  ggplot(data=., aes(x=0, y=pp)) +
-  geom_boxplot(outlier.shape = NA, width=1) +
-  geom_jitter(width=0.1) +
-  xlim(-1.5, 1.5)
-# sample_size
-temp$period_infection %>% 
-  select(sample_size_cf, study) %>%  view
-# distribution of prevalence estimates
-temp$period_infection %>% 
-  mutate(pp=all_ntm_infection/sample_size_cf*100) %>%   
-  count(pp) %>% 
-  summary()
-# view results according to study and time-interval
-temp$period_infection %>% 
-  mutate(
-    study_length=last_year_data-first_year_data+1,
-    pp=all_ntm_infection/sample_size_cf*100) %>% 
-    select(study, study_length, pp,
-           all_ntm_infection, sample_size_cf)
-# overall risk of bias  
-temp$period_infection %>% 
-  count_table(Overall_risk)
-```
-
-## For NTM disease
-
-```{r}
-temp$period_disease<- 
-  clean_data %>% 
-  filter(period_disease=="yes") %>% 
-  mutate(interval=last_year_data-first_year_data+1)
-
-temp$period_disease %>% count(region1)
-temp$period_disease %>% select(sample_size_cf, study) 
-temp$period_disease %>% select(interval, study) 
-temp$period_disease %>% count(study_design) 
-
-```
 
 
 ```{r}
