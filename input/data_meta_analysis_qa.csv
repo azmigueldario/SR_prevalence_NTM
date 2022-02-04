@@ -1,96 +1,97 @@
-id,publication_date,study_design,sample_size_cf,region,country,used_registry,age_group,mabs_infection,avium_infection,other_ntm_infection,ntm_point_infection,first_year_data,last_year_data,disease_events,disease_sample,Q1_Sampling_frame,Q2_Sampling_scheme,Q3_Sample_size,Q4_Population_description,Q5_Coverage_of_sample,Q6_Identification_methods,Q7_Standardized_measurement,Q8_Statistical_calculation,Q9_Response_rate,period_infection_ind,period_disease_ind,point_disease_ind,incidence_ind,point_infection_ind,annual_period_ind,sample_size_period,inf_events_period,period_inf_perc
-abidin2021,2020,Cross-sectional study,4687, EUR,United Kingdom,UK,pediatric,176,92,NA,303,2016,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,Yes,Unclear,yes,no,no,no,yes,no,4687,303,NA
-ademhan-tural2021,2021,Cohort study (prospective),485,EUR,Turkey,no,mixed,8,1,1,10,2012,2020,5,485,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,yes,no,no,no,no,485,10,NA
-adjemian2014,2014,Cross-sectional study,10527, NAM,United States,US,mixed,NA,NA,NA,1384,2010,2011,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,No ,yes,no,no,no,no,yes,10527,1384,NA
-adjemian2018,2018,Cross-sectional study,16153, NAM,United States,US,mixed,1249,1949,NA,NA,2010,2014,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,Yes,yes,no,no,no,yes,yes,16153,3363,NA
-ahmed2018,2018,Cohort study (prospective),42, EUR,United Kingdom,no,pediatric,2,2,2,6,2012,2016,NA,NA,Yes,Yes ,No ,Yes,Missing,Yes,Yes,Yes,No ,yes,no,no,no,no,no,42,6,NA
-aiello2018,2018,Cross-sectional study,117, LAC,Brazil,no,mixed,4,2,NA,7,2014,2015,NA,NA,Yes,No ,No ,No,Missing,Yes,Yes,Yes,No ,yes,no,no,no,no,no,117,7,NA
-aitken1993,1993,Cross-sectional study,64, NAM,United States,no,adult,0,7,1,8,1990,1991,NA,NA,Yes,Unclear,No ,Yes,Missing,Yes,Unclear,Yes,No ,yes,no,no,no,no,yes,64,8,NA
-australia2010,2012,Registry report,1946,AUS,Australia,Australia,mixed,NA,NA,NA,21,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-australia2011,2012,Registry report,2001,AUS,Australia,Australia,mixed,NA,NA,NA,24,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-australia2012,2013,Registry report,2182,AUS,Australia,Australia,mixed,NA,NA,NA,32,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-australia2013,2015,Registry report,2206,AUS,Australia,Australia,mixed,NA,NA,NA,42,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Unclear,Unclear,no,no,no,no,yes,no,NA,NA,NA
-australia2014,2016,Registry report,2021,AUS,Australia,Australia,mixed,NA,NA,NA,50,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,No ,No ,no,no,no,no,yes,no,NA,NA,NA
-australia2015,2017,Registry report,2047,AUS,Australia,Australia,mixed,NA,NA,NA,57,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-australia2016,2018,Registry report,1769,AUS,Australia,Australia,mixed,NA,NA,NA,46,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-australia2017,2019,Registry report,1323,AUS,Australia,Australia,mixed,NA,NA,NA,55,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-bange2001,2001,Cross-sectional study,214, EUR,Germany,no,NA,5,8,4,15,1997,1999,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Unclear,Yes,Yes,yes,no,no,no,no,no,214,15,NA
-bar-on2015,2014,Cohort study (retrospective),110,ME,Israel,no,mixed,NA,NA,NA,16,2011,2011,NA,NA,Yes,Yes ,No ,Yes,Missing,Yes,Yes,Yes,Unclear,yes,yes,yes,yes,yes,no,180,34,NA
-binder2013,2013,Cohort study (retrospective),5403, NAM,United States,US,mixed,69,122,NA,NA,2010,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,yes,no,no,NA,NA,NA
-brazil2010,NA,Registry report,1440,LAC,Brazil,Brazil,mixed,NA,NA,NA,6,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-brazil2011,NA,Registry report,1562,LAC,Brazil,Brazil,mixed,NA,NA,NA,4,2011,2011,NA,NA,Yes,Yes ,Yes ,No,Missing,No ,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-brazil2012,NA,Registry report,2132,LAC,Brazil,Brazil,mixed,NA,NA,NA,5,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-brazil2013,NA,Registry report,2238,LAC,Brazil,Brazil,mixed,NA,NA,NA,8,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-brazil2014,NA,Registry report,2571,LAC,Brazil,Brazil,mixed,NA,NA,NA,12,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-brazil2015,NA,Registry report,2961,LAC,Brazil,Brazil,mixed,NA,NA,NA,13,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-brazil2016,NA,Registry report,3212,LAC,Brazil,Brazil,mixed,NA,NA,NA,17,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-brazil2017,NA,Registry report,3378,LAC,Brazil,Brazil,mixed,NA,NA,NA,9,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,No ,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-campos-herrero2016,2016,Cross-sectional study,44, EUR,Spain,no,mixed,7,1,10,18,2002,2012,10,44,Yes,Yes ,No ,No,Missing,Yes,Yes,Yes,Yes,yes,yes,no,yes,yes,no,44,18,NA
-canada2011,NA,Registry report,3913, NAM,Canada,Canada,mixed,NA,NA,NA,91,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-canada2012,2014,Registry report,3913, NAM,Canada,Canada,mixed,NA,NA,NA,109,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-canada2013,2015,Registry report,4077, NAM,Canada,Canada,mixed,NA,NA,NA,116,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-canada2014,2016,Registry report,4128, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-canada2015,2017,Registry report,4192, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-canada2016,2017,Registry report,4246, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-canada2017,2018,Registry report,4309, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-canada2018,2019,Registry report,4371, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2018,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-canada2019,2020,Registry report,4344, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2019,2019,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-candido2014,2014,Cross-sectional study,129,LAC,Brazil,no,NA,8,1,1,10,2009,2012,1,129,Yes,Yes ,No ,No,Missing,Unclear,Unclear,Yes,Unclear,yes,yes,no,no,no,no,129,10,NA
-cavalli2017,2017,Cohort study (retrospective),401, EUR,France,no,mixed,18,27,4,48,2009,2014,15,4013,Yes,Yes ,Yes ,No,Missing,No ,Yes,Yes,Unclear,yes,yes,no,no,no,no,401,48,NA
-ecfs2010,NA,Registry report,22358, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,420,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-ecfs2011,2017,Registry report,26700, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,662,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-ecfs2012,2017,Registry report,27686, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,823,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-ecfs2013,2016,Registry report,28596, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,931,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-ecfs2014,2016,Registry report,28961, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,1001,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-ecfs2015,2017,Registry report,31763, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,1032,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-ecfs2016,2018,Registry report,25464, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,635,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-ecfs2017,2019,Registry report,39667, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,1437,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-ecfs2018,2018,Registry report,30957, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,1323,2018,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-esther2005,2005,Cross-sectional study,431, NAM,United States,no,pediatric,8,10,1,17,1993,2002,NA,NA,Yes,No ,Yes ,No,Missing,Unclear,Unclear,Yes,Unclear,yes,no,no,no,no,no,431,NA,3.9
-esther2010,2010,Cross-sectional study,829, NAM,United States,no,mixed,68,98,NA,166,2000,2007,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,No ,yes,no,no,no,no,no,829,166,NA
-fauroux1997,1997,Cohort study (prospective),106, EUR,France,no,pediatric,3,0,4,7,1995,1996,2,106,Yes,Unclear,No ,No,Missing,Yes,No,Yes,Unclear,yes,yes,no,no,no,no,106,7,NA
-fernandez-caso2020,2020,Cross-sectional study,92, EUR,Spain,no,adult,7,13,9,28,2010,2017,NA,NA,Yes,Unclear,No ,Yes,Missing,Yes,Unclear,Unclear,Unclear,yes,no,no,no,no,no,92,28,NA
-gardner2019,2018,Cross-sectional study,5333, EUR,United Kingdom,UK,pediatric,NA,NA,NA,288,2010,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,yes,no,5333,288,NA
-giron2005,2005,Cohort study (prospective),28, EUR,Spain,no,adult,3,2,2,7,1997,2001,2,25,Yes,Yes ,No ,Yes,Missing,Yes,Unclear,Yes,Unclear,yes,yes,no,no,no,no,28,7,NA
-hatziagorou2020,2019,Cohort study (prospective),41101, EUR,NA,ECFS,NA,NA,NA,NA,NA,2011,2016,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Unclear,no,no,no,yes,yes,no,NA,NA,NA
-hjelt1994,1994,Cross-sectional study,185, EUR,Denmark,no,mixed,5,3,5,13,1987,1988,NA,NA,Yes,Yes ,No ,No,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,no,yes,185,13,NA
-ho2021,2021,Cross-sectional study,171,AFR,France,no,mixed,31,14,8,51,2002,2015,12,171,Yes,Yes ,No ,No,Missing,Unclear,Unclear,Yes,Yes,yes,yes,no,no,no,no,171,51,NA
-hughes2021,2021,Cross-sectional study,567,EUR,United Kingdom,no,pediatric,34,21,8,59,2011,2018,35,567,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,Unclear,yes,yes,no,no,no,no,567,59,NA
-kilby1992,1992,Cross-sectional study,87, NAM,United States,no,adult,0,13,6,17,1981,1990,NA,NA,Yes,Yes ,No ,Yes,Missing,Yes,No,Yes,Yes,yes,no,no,no,no,no,87,17,NA
-kopp2015,2015,Cross-sectional study,30896, NAM,United States,US,mixed,NA,NA,NA,2512,2007,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,Unclear,yes,no,no,no,no,no,30896,2512,NA
-leitriz2003,2004,Cohort study (prospective),91, EUR,Germany,no,mixed,1,4,5,10,1999,2000,NA,NA,Yes,Unclear,No , Unclear,Missing,Yes,No,Yes,Unclear,yes,no,no,yes,no,no,91,NA,11
-levy2008,2008,Cross-sectional study,186,ME,Israel,no,mixed,13,6,19,42,2001,2003,10,186,Yes,No ,No ,Yes,Missing,Yes,No,Yes,No ,yes,yes,no,no,no,no,186,42,NA
-mulherin1990,1990,Cohort study - prospective,41, EUR,Replublic of Ireland,no,NA,NA,1,NA,1,1990,NA,NA,NA,Yes,No ,No ,No,Missing,Yes,Unclear,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-mussaffi2005,2005,Cross-sectional study,139,ME,Israel,no,mixed,NA,NA,NA,12,1997,2002,6,139,Yes,Unclear,No ,No,Missing,Unclear,Yes,Yes,Unclear,yes,yes,no,no,no,no,139,12,NA
-oliver2001,2001,Cohort study (prospective),37, EUR,Spain,no,mixed,NA,2,4,6,2001,NA,NA,NA,Yes,Unclear,No ,No,Missing,Yes,Yes,Yes,Unclear,yes,no,no,no,no,no,37,6,NA
-olivier2003b,2003,Cross-sectional study,986, NAM,United States,no,mixed,23,97,13,128,1998,NA,NA,NA,Yes,Unclear,Yes ,Yes,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,yes,no,986,128,NA
-paschoal2007,2007,Cross-sectional study,54,LAC,Brazil,no,adult,NA,NA,NA,9,2003,2004,NA,NA,Yes,Yes ,No ,Yes,Missing,Unclear,Unclear,Yes,Yes,yes,no,no,no,no,yes,54,9,NA
-phelippeau2015,2015,Cohort study (prospective),354, EUR,France,no,mixed,12,8,5,25,2010,2014,NA,NA,Yes,Unclear,Yes ,No,Missing,Yes,Unclear,Yes,Unclear,yes,no,no,no,no,no,354,25,NA
-pierre-audigier2005,2005,Cross-sectional study,385, EUR,France,no,mixed,13,7,11,31,2000,2000,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,no,yes,385,31,NA
-plongla2017,2017,Cohort study (prospective),487, NAM,United States,no,mixed,NA,NA,NA,69,2015,2016,NA,NA,Yes,No ,Yes ,No,Missing,Yes,No,Yes,Unclear,yes,no,no,no,no,yes,487,69,NA
-preece2016,2015,Cross-sectional study,210, EUR,United Kingdom,no,mixed,20,NA,NA,33,2014,2015,NA,NA,Yes,Unclear,Yes ,No,Missing,No ,No,Yes,Unclear,yes,no,no,no,no,yes,210,20,NA
-qvist2014,2014,Cohort study (prospective),198, EUR,Denmark,no,NA,17,6,NA,23,2012,2013,19,198,Yes,No ,Yes ,Yes,Missing,Yes,No,Yes,No ,yes,yes,no,no,no,no,198,23,NA
-qvist2015a,2015,Cross-sectional study,1270, EUR,"Denmark, Norway and Sweden",no,mixed,87,68,19,157,2000,2012,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Unclear,Yes,Yes,yes,no,no,no,no,no,1270,157,NA
-radhakrishnan2009,2009,Cross-sectional study,98, NAM,Canada,no,pediatric,2,4,NA,6,2004,2004,1,98,Yes,Yes ,No ,Yes,Missing,Yes,Yes,Yes,Yes,no,no,yes,no,yes,no,NA,NA,NA
-raidt2015,2015,Cross-sectional study,94,EUR,Germany,no,mixed,4,2,1,7,2011,2011,NA,NA,Yes,No ,No ,No,Missing,Unclear,Unclear,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA
-roux2009,2009,Cohort study (prospective),1582, EUR,France,no,mixed,50,23,34,104,2014,2014,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,no,yes,1582,104,NA
-salsgiver2016,2016,Cohort study (prospective),"31,915", NAM,United States,US,mixed,NA,NA,NA,NA,2010,2012,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-satana2014,2014,Cross-sectional study,130, EUR,Turkey,no,pediatric,3,0,1,4,2003,2008,NA,NA,Yes,No ,No ,No,Missing,Yes,Unclear,Yes,Unclear,yes,no,no,no,no,no,130,4,NA
-scohy2018,2018,Cross-sectional study,124,EUR,Belgium,no,mixed,11,4,4,20,2016,2017,NA,NA,Yes,Yes ,No ,No,Missing,Yes,Yes,Yes,Unclear,yes,no,no,no,no,yes,124,20,NA
-seddon2013,2013,Cross-sectional study,7122, EUR,United Kingdom,no,mixed,NA,NA,NA,300,2008,2009,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,No,Yes,Yes,yes,no,no,no,no,yes,7122,300,NA
-sermet-gaudelus2003,2003,Cross-sectional study,296, EUR,France,no,mixed,15,6,11,29,1996,1999,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,yes,no,no,no,no,296,29,NA
-smith1984,1984,Cross-sectional study,233, EUR,United Kingdom,no,adult,NA,NA,NA,4,1978,1984,NA,NA,Yes,No ,Yes ,No,Missing,Unclear,No,Yes,Unclear,yes,no,no,no,no,no,233,4,NA
-torrens1998,1998,Cross-sectional study,372, EUR,United Kingdom,no,mixed,0,4,10,14,1989,1997,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,no,no,372,14,NA
-usa2010,2011,Registry report,9462, NAM,United States,US,mixed,NA,NA,NA,939,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-usa2011,2012,Registry report,10848, NAM,United States,US,mixed,NA,NA,NA,1169,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-usa2012,2013,Registry report,11927, NAM,United States,US,mixed,527,729,NA,1412,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-usa2013,2014,Registry report,12873, NAM,United States,US,mixed,586,746,NA,1543,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-usa2014,2015,Registry report,13602, NAM,United States,US,mixed,628,847,NA,1657,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-usa2015,2016,Registry report,14225, NAM,United States,US,mixed,630,891,NA,1692,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-usa2016,2017,Registry report,14501, NAM,United States,US,mixed,713,922,NA,1846,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-usa2017,2018,Registry report,15041, NAM,United States,US,mixed,782,966,NA,1903,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-usa2018,2019,Registry report,15067, NAM,United States,US,mixed,1009,860,NA,2055,2018,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA
-usa2019,2020,Registry report,15497, NAM,United States,US,mixed,888,1057,NA,2149,2019,2019,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-valenza2008,2008,Cross-sectional study,60, EUR,Germany,no,mixed,4,4,NA,8,2006,2006,NA,NA,Yes,Unclear,No ,No,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA
-viviani2016,2016,Cross-sectional study,13593, EUR,NA,ECFS,mixed,NA,NA,NA,374,2009,2009,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Yes,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA
-yan2020,2019,Cross-sectional study,99,AUS,Australia,no,pediatric,22,NA,NA,36,2013,2017,NA,NA,Yes,Unclear,No ,No,Missing,Unclear,Yes,Yes,Unclear,yes,no,no,no,no,no,99,36,NA
+id,publication_date,study_design,sample_size_cf,region,country,used_registry,age_group,mabs_infection,avium_infection,other_ntm_infection,ntm_point_infection,first_year_data,last_year_data,disease_events,disease_sample,Q1_Sampling_frame,Q2_Sampling_scheme,Q3_Sample_size,Q4_Population_description,Q5_Coverage_of_sample,Q6_Identification_methods,Q7_Standardized_measurement,Q8_Statistical_calculation,Q9_Response_rate,period_infection_ind,period_disease_ind,point_disease_ind,incidence_ind,point_infection_ind,annual_period_ind,sample_size_period,inf_events_period,point_inf_perc,period_inf_perc,females_perc,testing_freq,ntm_specimen,decontamination,culture_method
+abidin2021,2020,Cross-sectional study,4687, EUR,United Kingdom,UK,pediatric,176,92,NA,303,2016,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,Yes,Unclear,yes,no,no,no,yes,no,4687,303,NA,NA,0.514,NA,NA,NA,NA
+ademhan-tural2021,2021,Cohort study (prospective),485,EUR,Turkey,no,mixed,8,1,1,10,2012,2020,5,485,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,yes,no,no,no,no,485,10,NA,NA,NA,annual,sputum & BAL,yes,MGIT & L-J
+adjemian2014,2014,Cross-sectional study,10527, NAM,United States,US,mixed,NA,NA,NA,1384,2010,2011,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,No ,yes,no,no,no,no,yes,10527,1384,NA,NA,NA,annual,NA,NA,NA
+adjemian2018,2018,Cross-sectional study,16153, NAM,United States,US,mixed,1249,1949,NA,NA,2010,2014,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,Yes,yes,no,no,no,yes,yes,16153,3363,NA,NA,0.48,annual,NA,NA,NA
+ahmed2018,2018,Cohort study (prospective),42, EUR,United Kingdom,no,pediatric,2,2,2,6,2012,2016,NA,NA,Yes,Yes ,No ,Yes,Missing,Yes,Yes,Yes,No ,yes,no,no,no,no,no,42,6,NA,NA,0.5476,annual,sputum,yes,MGIT & L-J
+aiello2018,2018,Cross-sectional study,117, LAC,Brazil,no,mixed,4,2,NA,7,2014,2015,NA,NA,Yes,No ,No ,No,Missing,Yes,Yes,Yes,No ,yes,no,no,no,no,no,117,7,NA,NA,0.428,annual,sputum & BAL,yes,MGIT
+aitken1993,1993,Cross-sectional study,64, NAM,United States,no,adult,0,7,1,8,1990,1991,NA,NA,Yes,Unclear,No ,Yes,Missing,Yes,Unclear,Yes,No ,yes,no,no,no,no,yes,64,8,NA,NA,0.5625,NA,sputum,yes,MGIT & L-J
+australia2010,2012,Registry report,1946,AUS,Australia,Australia,mixed,NA,NA,NA,21,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.469,NA,sputum & BAL,NA,NA
+australia2011,2012,Registry report,2001,AUS,Australia,Australia,mixed,NA,NA,NA,24,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.473,NA,sputum & BAL,NA,NA
+australia2012,2013,Registry report,2182,AUS,Australia,Australia,mixed,NA,NA,NA,32,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.471,NA,sputum & BAL,NA,NA
+australia2013,2015,Registry report,2206,AUS,Australia,Australia,mixed,NA,NA,NA,42,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Unclear,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.471,NA,sputum & BAL,NA,NA
+australia2014,2016,Registry report,2021,AUS,Australia,Australia,mixed,NA,NA,NA,50,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,No ,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.4696,NA,sputum & BAL,NA,NA
+australia2015,2017,Registry report,2047,AUS,Australia,Australia,mixed,NA,NA,NA,57,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.4679,NA,sputum & BAL,NA,NA
+australia2016,2018,Registry report,1769,AUS,Australia,Australia,mixed,NA,NA,NA,46,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.4661,NA,sputum & BAL,NA,NA
+australia2017,2019,Registry report,1323,AUS,Australia,Australia,mixed,NA,NA,NA,55,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.463,NA,sputum & BAL,NA,NA
+bange2001,2001,Cross-sectional study,214, EUR,Germany,no,NA,5,8,4,15,1997,1999,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Unclear,Yes,Yes,yes,no,no,no,no,no,214,15,NA,NA,NA,subjective,sputum & BAL,yes,MGIT
+bar-on2015,2014,Cohort study (retrospective),110,ME,Israel,no,mixed,NA,NA,NA,16,2011,2011,NA,NA,Yes,Yes ,No ,Yes,Missing,Yes,Yes,Yes,Unclear,yes,yes,yes,yes,yes,no,180,34,NA,NA,NA,every 3 months,sputum,yes,MGIT & L-J
+binder2013,2013,Cohort study (retrospective),5403, NAM,United States,US,mixed,69,122,NA,NA,2010,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,yes,no,no,NA,NA,12.04,NA,NA,NA,NA,NA,NA
+brazil2010,NA,Registry report,1440,LAC,Brazil,Brazil,mixed,NA,NA,NA,6,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.476,NA,NA,NA,NA
+brazil2011,NA,Registry report,1562,LAC,Brazil,Brazil,mixed,NA,NA,NA,4,2011,2011,NA,NA,Yes,Yes ,Yes ,No,Missing,No ,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.465,NA,NA,NA,NA
+brazil2012,NA,Registry report,2132,LAC,Brazil,Brazil,mixed,NA,NA,NA,5,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.469,NA,NA,NA,NA
+brazil2013,NA,Registry report,2238,LAC,Brazil,Brazil,mixed,NA,NA,NA,8,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.472,NA,NA,NA,NA
+brazil2014,NA,Registry report,2571,LAC,Brazil,Brazil,mixed,NA,NA,NA,12,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.472,NA,NA,NA,NA
+brazil2015,NA,Registry report,2961,LAC,Brazil,Brazil,mixed,NA,NA,NA,13,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.478,NA,NA,NA,NA
+brazil2016,NA,Registry report,3212,LAC,Brazil,Brazil,mixed,NA,NA,NA,17,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.4798,NA,NA,NA,NA
+brazil2017,NA,Registry report,3378,LAC,Brazil,Brazil,mixed,NA,NA,NA,9,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,No ,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.48,NA,NA,NA,NA
+campos-herrero2016,2016,Cross-sectional study,44, EUR,Spain,no,mixed,7,1,10,18,2002,2012,10,44,Yes,Yes ,No ,No,Missing,Yes,Yes,Yes,Yes,yes,yes,no,yes,yes,no,44,18,NA,NA,NA,NA,sputum,yes,MGIT & L-J
+canada2011,NA,Registry report,3913, NAM,Canada,Canada,mixed,NA,NA,NA,91,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.473,NA,NA,NA,NA
+canada2012,2014,Registry report,3913, NAM,Canada,Canada,mixed,NA,NA,NA,109,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.4709,NA,NA,NA,NA
+canada2013,2015,Registry report,4077, NAM,Canada,Canada,mixed,NA,NA,NA,116,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.4709,NA,NA,NA,NA
+canada2014,2016,Registry report,4128, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,3.5,NA,0.469,NA,NA,NA,NA
+canada2015,2017,Registry report,4192, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,3.9,NA,0.471,NA,NA,NA,NA
+canada2016,2017,Registry report,4246, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,4.5,NA,0.464,NA,NA,NA,NA
+canada2017,2018,Registry report,4309, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6.5,NA,0.461,NA,NA,NA,NA
+canada2018,2019,Registry report,4371, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2018,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6.1,NA,0.465,NA,NA,NA,NA
+canada2019,2020,Registry report,4344, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2019,2019,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6,NA,0.466,NA,NA,NA,NA
+candido2014,2014,Cross-sectional study,129,LAC,Brazil,no,NA,8,1,1,10,2009,2012,1,129,Yes,Yes ,No ,No,Missing,Unclear,Unclear,Yes,Unclear,yes,yes,no,no,no,no,129,10,NA,NA,NA,NA,sputum,yes,L-J
+cavalli2017,2017,Cohort study (retrospective),401, EUR,France,no,mixed,18,27,4,48,2009,2014,15,4013,Yes,Yes ,Yes ,No,Missing,No ,Yes,Yes,Unclear,yes,yes,no,no,no,no,401,48,NA,NA,NA,annual,sputum,NA,NA
+ecfs2010,NA,Registry report,22358, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,420,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.477,NA,NA,NA,NA
+ecfs2011,2017,Registry report,26700, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,662,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.475,NA,NA,NA,NA
+ecfs2012,2017,Registry report,27686, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,823,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.474,NA,NA,NA,NA
+ecfs2013,2016,Registry report,28596, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,931,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.473,NA,NA,NA,NA
+ecfs2014,2016,Registry report,28961, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,1001,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.4737,NA,NA,NA,NA
+ecfs2015,2017,Registry report,31763, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,1032,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.4746,NA,NA,NA,NA
+ecfs2016,2018,Registry report,25464, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,635,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,No,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.4745,NA,NA,NA,NA
+ecfs2017,2019,Registry report,39667, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,1437,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.474,NA,NA,NA,NA
+ecfs2018,2018,Registry report,30957, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,1323,2018,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.475,NA,NA,NA,NA
+esther2005,2005,Cross-sectional study,431, NAM,United States,no,pediatric,8,10,1,17,1993,2002,NA,NA,Yes,No ,Yes ,No,Missing,Unclear,Unclear,Yes,Unclear,yes,no,no,no,no,no,431,NA,NA,3.9,NA,subjective,sputum & BAL,yes,MGIT & L-J
+esther2010,2010,Cross-sectional study,829, NAM,United States,no,mixed,68,98,NA,166,2000,2007,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,No ,yes,no,no,no,no,no,829,166,NA,NA,NA,subjective,sputum & BAL,NA,NA
+fauroux1997,1997,Cohort study (prospective),106, EUR,France,no,pediatric,3,0,4,7,1995,1996,2,106,Yes,Unclear,No ,No,Missing,Yes,No,Yes,Unclear,yes,yes,no,no,no,no,106,7,NA,NA,0.571,bi-annual,sputum,yes,L-J
+fernandez-caso2020,2020,Cross-sectional study,92, EUR,Spain,no,adult,7,13,9,28,2010,2017,NA,NA,Yes,Unclear,No ,Yes,Missing,Yes,Unclear,Unclear,Unclear,yes,no,no,no,no,no,92,28,NA,NA,0.489,NA,sputum,NA,NA
+gardner2019,2018,Cross-sectional study,5333, EUR,United Kingdom,UK,pediatric,NA,NA,NA,288,2010,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,yes,no,5333,288,NA,NA,0.491,annual,NA,NA,NA
+giron2005,2005,Cohort study (prospective),28, EUR,Spain,no,adult,3,2,2,7,1997,2001,2,25,Yes,Yes ,No ,Yes,Missing,Yes,Unclear,Yes,Unclear,yes,yes,no,no,no,no,28,7,NA,NA,0.428,NA,sputum,yes,"MGIT, Coletsos & L-J"
+hatziagorou2020,2019,Cohort study (prospective),41101, EUR,NA,ECFS,NA,NA,NA,NA,NA,2011,2016,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Unclear,no,no,no,yes,yes,no,NA,NA,3.48,NA,NA,NA,NA,NA,NA
+hjelt1994,1994,Cross-sectional study,185, EUR,Denmark,no,mixed,5,3,5,13,1987,1988,NA,NA,Yes,Yes ,No ,No,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,no,yes,185,13,NA,NA,NA,study period,sputum,yes,L-J
+ho2021,2021,Cross-sectional study,171,AFR,France,no,mixed,31,14,8,51,2002,2015,12,171,Yes,Yes ,No ,No,Missing,Unclear,Unclear,Yes,Yes,yes,yes,no,no,no,no,171,51,NA,NA,0.55,annual,sputum & BAL,NA,NA
+hughes2021,2021,Cross-sectional study,567,EUR,United Kingdom,no,pediatric,34,21,8,59,2011,2018,35,567,Yes,Yes ,Yes ,No,Missing,Unclear,Unclear,Yes,Unclear,yes,yes,no,no,no,no,567,59,NA,NA,0.68,subjective,sputum & BAL,NA,NA
+kilby1992,1992,Cross-sectional study,87, NAM,United States,no,adult,0,13,6,17,1981,1990,NA,NA,Yes,Yes ,No ,Yes,Missing,Yes,No,Yes,Yes,yes,no,no,no,no,no,87,17,NA,NA,0.5309,subjective,sputum,yes,L-J
+kopp2015,2015,Cross-sectional study,30896, NAM,United States,US,mixed,NA,NA,NA,2512,2007,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,Unclear,yes,no,no,no,no,no,30896,2512,NA,NA,0.481,NA,NA,NA,NA
+leitriz2003,2004,Cohort study (prospective),91, EUR,Germany,no,mixed,1,4,5,10,1999,2000,NA,NA,Yes,Unclear,No , Unclear,Missing,Yes,No,Yes,Unclear,yes,no,no,yes,no,no,91,NA,NA,11,0.582,NA,sputum & BAL,yes,MGIT & L-J
+levy2008,2008,Cross-sectional study,186,ME,Israel,no,mixed,13,6,19,42,2001,2003,10,186,Yes,No ,No ,Yes,Missing,Yes,No,Yes,No ,yes,yes,no,no,no,no,186,42,NA,NA,0.602,NA,sputum,NA,MGIT & L-J
+mulherin1990,1990,Cohort study - prospective,41, EUR,Replublic of Ireland,no,NA,NA,1,NA,1,1990,NA,NA,NA,Yes,No ,No ,No,Missing,Yes,Unclear,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,NA,NA,sputum,NA,L-J
+mussaffi2005,2005,Cross-sectional study,139,ME,Israel,no,mixed,NA,NA,NA,12,1997,2002,6,139,Yes,Unclear,No ,No,Missing,Unclear,Yes,Yes,Unclear,yes,yes,no,no,no,no,139,12,NA,NA,NA,NA,sputum,yes,NA
+oliver2001,2001,Cohort study (prospective),37, EUR,Spain,no,mixed,NA,2,4,6,2001,NA,NA,NA,Yes,Unclear,No ,No,Missing,Yes,Yes,Yes,Unclear,yes,no,no,no,no,no,37,6,NA,NA,NA,study period,sputum,yes,L-J & MycoTb
+olivier2003b,2003,Cross-sectional study,986, NAM,United States,no,mixed,23,97,13,128,1998,NA,NA,NA,Yes,Unclear,Yes ,Yes,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,yes,no,986,128,NA,NA,0.47,NA,sputum,yes,L-J
+paschoal2007,2007,Cross-sectional study,54,LAC,Brazil,no,adult,NA,NA,NA,9,2003,2004,NA,NA,Yes,Yes ,No ,Yes,Missing,Unclear,Unclear,Yes,Yes,yes,no,no,no,no,yes,54,9,NA,NA,0.5,NA,sputum,NA,NA
+phelippeau2015,2015,Cohort study (prospective),354, EUR,France,no,mixed,12,8,5,25,2010,2014,NA,NA,Yes,Unclear,Yes ,No,Missing,Yes,Unclear,Yes,Unclear,yes,no,no,no,no,no,354,25,NA,NA,0.562,NA,NA,yes,MGIT
+pierre-audigier2005,2005,Cross-sectional study,385, EUR,France,no,mixed,13,7,11,31,2000,2000,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,no,yes,385,31,NA,NA,0.4727,every 3 months,sputum,yes,L-J
+plongla2017,2017,Cohort study (prospective),487, NAM,United States,no,mixed,NA,NA,NA,69,2015,2016,NA,NA,Yes,No ,Yes ,No,Missing,Yes,No,Yes,Unclear,yes,no,no,no,no,yes,487,69,NA,NA,0.536,NA,"sputum, swabs & BAL",yes,"MGIT, L-J, BC & RGM"
+preece2016,2015,Cross-sectional study,210, EUR,United Kingdom,no,mixed,20,NA,NA,33,2014,2015,NA,NA,Yes,Unclear,Yes ,No,Missing,No ,No,Yes,Unclear,yes,no,no,no,no,yes,210,20,NA,NA,NA,subjective,sputum,NA,RGM & BC
+qvist2014,2014,Cohort study (prospective),198, EUR,Denmark,no,NA,17,6,NA,23,2012,2013,19,198,Yes,No ,Yes ,Yes,Missing,Yes,No,Yes,No ,yes,yes,no,no,no,no,198,23,NA,NA,NA,annual,sputum & BAL,yes,"MGIT, L-J & BC"
+qvist2015a,2015,Cross-sectional study,1270, EUR,"Denmark, Norway and Sweden",no,mixed,87,68,19,157,2000,2012,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Unclear,Yes,Yes,yes,no,no,no,no,no,1270,157,NA,NA,NA,annual,sputum & BAL,yes,"MGIT, L-J & BC"
+radhakrishnan2009,2009,Cross-sectional study,98, NAM,Canada,no,pediatric,2,4,NA,6,2004,2004,1,98,Yes,Yes ,No ,Yes,Missing,Yes,Yes,Yes,Yes,no,no,yes,no,yes,no,NA,NA,NA,NA,0.551,study period,sputum,yes,MGIT & L-J
+raidt2015,2015,Cross-sectional study,94,EUR,Germany,no,mixed,4,2,1,7,2011,2011,NA,NA,Yes,No ,No ,No,Missing,Unclear,Unclear,Yes,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.479,NA,sputum & swabs,NA,BC
+roux2009,2009,Cohort study (prospective),1582, EUR,France,no,mixed,50,23,34,104,2014,2014,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,no,yes,1582,104,NA,NA,0.486,NA,sputum,yes,MGIT & L-J
+salsgiver2016,2016,Cohort study (prospective),"31,915", NAM,United States,US,mixed,NA,NA,NA,NA,2010,2012,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,NA,NA,sputum & BAL,NA,NA
+satana2014,2014,Cross-sectional study,130, EUR,Turkey,no,pediatric,3,0,1,4,2003,2008,NA,NA,Yes,No ,No ,No,Missing,Yes,Unclear,Yes,Unclear,yes,no,no,no,no,no,130,4,NA,NA,0.476,NA,sputum,yes,MGIT
+scohy2018,2018,Cross-sectional study,124,EUR,Belgium,no,mixed,11,4,4,20,2016,2017,NA,NA,Yes,Yes ,No ,No,Missing,Yes,Yes,Yes,Unclear,yes,no,no,no,no,yes,124,20,NA,NA,0.47,NA,sputum ,yes,MGIT
+seddon2013,2013,Cross-sectional study,7122, EUR,United Kingdom,no,mixed,NA,NA,NA,300,2008,2009,NA,NA,Yes,Yes ,Yes ,No,Missing,Unclear,No,Yes,Yes,yes,no,no,no,no,yes,7122,300,NA,NA,NA,annual,NA,NA,NA
+sermet-gaudelus2003,2003,Cross-sectional study,296, EUR,France,no,mixed,15,6,11,29,1996,1999,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,yes,no,no,no,no,296,29,NA,NA,0.534,annual,sputum,yes,L-J
+smith1984,1984,Cross-sectional study,233, EUR,United Kingdom,no,adult,NA,NA,NA,4,1978,1984,NA,NA,Yes,No ,Yes ,No,Missing,Unclear,No,Yes,Unclear,yes,no,no,no,no,no,233,4,NA,NA,NA,subjective,sputum,NA,NA
+torrens1998,1998,Cross-sectional study,372, EUR,United Kingdom,no,mixed,0,4,10,14,1989,1997,NA,NA,Yes,Yes ,Yes ,No,Missing,Yes,Yes,Yes,Yes,yes,no,no,no,no,no,372,14,NA,NA,NA,NA,sputum,yes,L-J
+usa2010,2011,Registry report,9462, NAM,United States,US,mixed,NA,NA,NA,939,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.482,NA,NA,NA,NA
+usa2011,2012,Registry report,10848, NAM,United States,US,mixed,NA,NA,NA,1169,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.482,NA,NA,NA,NA
+usa2012,2013,Registry report,11927, NAM,United States,US,mixed,527,729,NA,1412,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.483,NA,NA,NA,NA
+usa2013,2014,Registry report,12873, NAM,United States,US,mixed,586,746,NA,1543,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.485,NA,NA,NA,NA
+usa2014,2015,Registry report,13602, NAM,United States,US,mixed,628,847,NA,1657,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.484,NA,NA,NA,NA
+usa2015,2016,Registry report,14225, NAM,United States,US,mixed,630,891,NA,1692,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.484,NA,NA,NA,NA
+usa2016,2017,Registry report,14501, NAM,United States,US,mixed,713,922,NA,1846,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.484,NA,NA,NA,NA
+usa2017,2018,Registry report,15041, NAM,United States,US,mixed,782,966,NA,1903,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.484,NA,NA,NA,NA
+usa2018,2019,Registry report,15067, NAM,United States,US,mixed,1009,860,NA,2055,2018,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Yes,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.482,NA,NA,NA,NA
+usa2019,2020,Registry report,15497, NAM,United States,US,mixed,888,1057,NA,2149,2019,2019,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Unclear,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.481,NA,NA,NA,NA
+valenza2008,2008,Cross-sectional study,60, EUR,Germany,no,mixed,4,4,NA,8,2006,2006,NA,NA,Yes,Unclear,No ,No,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.433,NA,sputum,yes,MGIT
+viviani2016,2016,Cross-sectional study,13593, EUR,NA,ECFS,mixed,NA,NA,NA,374,2009,2009,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,Yes,Yes,Yes,no,no,no,no,yes,no,NA,NA,NA,NA,0.474,NA,NA,NA,NA
+yan2020,2019,Cross-sectional study,99,AUS,Australia,no,pediatric,22,NA,NA,36,2013,2017,NA,NA,Yes,Unclear,No ,No,Missing,Unclear,Yes,Yes,Unclear,yes,no,no,no,no,no,99,36,NA,NA,NA,annual,sputum & BAL,NA,NA
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,NA,,,,,,
