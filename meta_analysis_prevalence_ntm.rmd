@@ -89,10 +89,10 @@ temp$untidy_data<-
                                        TRUE ~ study_design),
          is_registry=case_when(study_design=="Registry report" ~ 1,
                                TRUE ~ 0),
-         size_cat_inf = case_when(sample_size_cf <= 300 ~ "small",
-                                  sample_size_cf <= 1000 & sample_size_cf > 300 ~ "medium",
-                                  sample_size_cf > 1000 ~ "large",
-                                  ))
+         size_cat = case_when(sample_size_cf <= 1000 ~ "small",
+                              sample_size_cf <= 3000 ~ "medium",
+                              sample_size_cf > 3000 ~ "large"),
+         size_cat = factor(size_cat, levels = c("small","medium", "large")))
 
 temp$untidy_data %>% 
   count(design_or_registry)
@@ -106,11 +106,19 @@ We create a grouping variable according to the first year of data collection of 
 ```{r date range groups}
 temp$untidy_data<- 
   temp$untidy_data %>%
-  mutate(before_year=case_when(first_year_data<2000 ~ "2000 or before",
+  mutate(before_year=case_when(first_year_data<1990 ~ "1990 or before",
+                               first_year_data<=2000 ~ "1990-2000",
                                first_year_data<=2004 ~ "2001-2004",
                                first_year_data<=2009 ~ "2005-2009",
                                first_year_data<=2014 ~ "2010-2014",
                                TRUE ~ "2015 or after")) 
+
+temp$untidy_data<- 
+  temp$untidy_data %>%
+  mutate(before_year=case_when(first_year_data<1990 ~ "1990 or before",
+                               first_year_data<=2000 ~ "1990-2000",
+                               first_year_data<=2009 ~ "2000-2009",
+                               TRUE ~ "2010-2019")) 
 
 count(temp$untidy_data, before_year) 
 ```
@@ -400,9 +408,16 @@ clean_data  %>%
 
 ```{r}
 # relevel before_year factor
+#clean_data$before_year<- factor(clean_data$before_year, 
+#                                levels = c("1990 or before", "1990-2000",
+#                                          "2001-2004", "2005-2009",
+#                                           "2010-2014", "2015 or after")) 
+
+## alternative
 clean_data$before_year<- factor(clean_data$before_year, 
-                                levels = c("2000 or before", "2001-2004", "2005-2009", 
-                                           "2010-2014", "2015 or after")) 
+                                levels = c("1990 or before", "1990-2000",
+                                           "2000-2009",
+                                           "2010-2019")) 
 
 # plot year of data vs sample size, facet by registry
 clean_data %>% 
@@ -450,9 +465,9 @@ clean_data %>%
 # sample size observational not using registry data
 clean_data %>%
   filter(design_or_registry!="Registry report/used registry") %>% 
-  summarise(median = median(sample_size_cf),
-            min = min(sample_size_cf),
-            max = max(sample_size_cf))
+  summarise(median = median(sample_size_cf, na.rm = T),
+            min = min(sample_size_cf, na.rm = T),
+            max = max(sample_size_cf, na.rm = T))
 
 # plot sample size vs year data collection, non-registry
 clean_data %>%
@@ -472,9 +487,22 @@ clean_data %>%
 
 clean_data %>% 
   filter(point_infection_ind=="yes" | annual_period_ind =="yes") %>% 
-  count_prop(size_cat_inf)
+  count_prop(size_cat)
 
+clean_data %>% 
+  filter(point_infection_ind=="yes" | annual_period_ind =="yes") %>% 
+  # percentages and calculated prevalence
+  mutate(estimate = case_when(is.na(point_inf_perc) ~ 
+                                (ntm_point_infection / sample_size_cf ) * 100,
+                              TRUE ~ point_inf_perc)) %>% 
+  ggplot(aes(x = sample_size_cf,
+             y = estimate)) +
+  geom_point()
+  
+
+is.na(clean_data$point_inf_perc)
 ```
+
 
 # Infection period prevalence
 
@@ -583,8 +611,6 @@ ggplot(data = temp$period_infection,
 
 ```
 
-
-
 # NTM disease outcomes 
 
 ```{r}
@@ -620,7 +646,7 @@ inf_point_data <-
   filter(point_infection_ind == "yes" | annual_period_ind =="yes") %>% 
   # drop_na
   drop_na(ntm_point_infection)
-# n= 59
+# n= 58
 ```
 
 In a meta-analysis including all studies, there is high heterogeneity. All observations cannot be plotted.  
@@ -696,6 +722,15 @@ update.meta(meta.full,
                  xlim = c(0, 1),
                  subgroup.name = "First year of data collection")
 
+
+inf_point_data %>% 
+  filter(is_registry==0) %>% 
+  metaprop_formatted() %>% 
+  update.meta(.,
+              subgroup = before_year,
+              tau.common = F) %>% 
+  forest_wrapper(xlim = c(0,1))
+
 ```
 
 We see reduced heterogeneity in the groups before 2000, 2001 - 2004 and 2005 - 2009. This difference is statistically significant. 
@@ -730,27 +765,25 @@ We use `metafor::rma.uni` function to fit the meta-analyses and indicate the mod
 
 ```{r calculate proportion effect size}
 # change reference level in factors
-metareg_data <- 
+inf_point_data <- 
   inf_point_data %>% 
   mutate(region1 = relevel(region1, ref = "NA"),
          before_year = relevel(before_year, ref = "2015 or after"),
          study_design = relevel(study_design, ref = "Registry report"),
-         sample_size_cat = case_when(sample_size_cf <= 1000 ~ "small", 
-                                     TRUE ~ "large"),
-         sample_size_cat = factor(sample_size_cat, levels = c("small", "large")),
+         size_cat = relevel(size_cat, ref = "large"),
          age_group =  factor(age_group, levels = c("mixed", "pediatric", "adult")))
 ```
 
 2. We will use Logit transformation (`PLO`) to optimize the properties of the generalized linear model as recommended by __(Schwarzer 2019)__
     * Beforehand, we verify concordance between `meta` and `metafor` packages
-    * Model with all pre-specified predictors failed to converge, the best prediction was obtained using `sample_size_cat`. Other covariates are included as pre-specified.
+    * Model with all pre-specified predictors failed to converge, the best prediction was obtained using sample size `(size_cat)`. Other covariates are included as pre-specified.
 
 ```{r metafor review and metaregression}
 metafor.full <- 
   rma.glmm(xi = ntm_point_infection,
            ni = sample_size_cf,
            slab = id,
-           data = metareg_data,
+           data = inf_point_data,
            method = "ML",
            measure = "PLO")
 
@@ -762,12 +795,13 @@ coef(metafor.full) %>% transf.ilogit()
 
 # ------------------- Meta regression wrapper and multiple models
 
-metareg_glmm_wrapper <- function(covs=NULL){ 
+metareg_glmm_wrapper <- function(covs=NULL,
+                                 data = inf_point_data){ 
   
   rma.glmm(xi = ntm_point_infection,
            ni = sample_size_cf,
            slab = id,
-           data = metareg_data,
+           data = data,
            method = "ML",
            measure = "PLO",
            # random effects model
@@ -777,18 +811,16 @@ metareg_glmm_wrapper <- function(covs=NULL){
                           optCtrl=list(iter.max=10000, rel.tol=1e-12)))
 }
 
-metareg_glmm_wrapper(covs=~ design_or_registry ) %>% 
+metareg_glmm_wrapper(covs=~ study_design ) %>% 
   AIC()
-metareg_glmm_wrapper(covs=~ design_or_registry + sample_size_cat) %>% 
+metareg_glmm_wrapper(covs=~ study_design + size_cat) %>% 
   AIC()
-metareg_glmm_wrapper(covs=~ design_or_registry + sample_size_cat + region1) %>% 
+metareg_glmm_wrapper(covs=~ study_design + size_cat + region1 + before_year) %>% 
   AIC()
-metareg_glmm_wrapper(covs=~ design_or_registry + sample_size_cat + region1 + before_year) 
-
 # selected model 
 
 metareg <- 
-  metareg_glmm_wrapper(covs=~ design_or_registry + sample_size_cat + region1 + before_year)
+metareg_glmm_wrapper(covs=~ study_design + size_cat + region1 + first_year_data) 
 
 ```
 
@@ -797,8 +829,8 @@ Finally, we produce a table of the model coefficients and calculate the change i
 ```{r}
 # create vector with formatted names for coefficients
 temp$coef.names <- c("Intercept", 
-                      "Design: cohort study", "Design: registry data", 
-                     "Large sample size (> 1000)",
+                     "Design: cross-sectional", "Design: cohort", 
+                     "Sample size < 1000", "Sample size = 1000 - 3000",
                      "European region", "Other regions",
                      "Before year 2000", "2001 - 2004", "2005 - 2009",
                      "2010 - 2014")
@@ -821,16 +853,15 @@ summary(metareg) %>%
 
 # --------- estimates calculation
 # baseline
-transf.ilogit(-0.75)
-# large sample size
-transf.ilogit(-0.75 - 0.8715)
+transf.ilogit(-2.352)
+# sample size < 1000
+transf.ilogit(-2.352 + 0.9963)
 # europe
-transf.ilogit(-0.75 - 0.8703)
+transf.ilogit(-2.352 - 0.9337)
 # other regions
-transf.ilogit(-0.75 - 2.0722)
+transf.ilogit(-2.352 - 2.1255)
 # before 2000
-transf.ilogit(-0.75 - 1.26)
-
+transf.ilogit(-2.352 - 1.3316)
 
 ```
 
@@ -841,18 +872,28 @@ Using only MABs infection point prevalence (and annual period prevalence)
 ```{r}
 metaprop_formatted(inf_point_data, event = mabs_infection) 
 
-metaprop(
 inf_point_data %>% 
   filter(!is.na(mabs_infection)) %>% 
   metaprop_formatted(.,
                      event = mabs_infection) %>%
-  forest_wrapper(., stu.res = F))
+  forest_wrapper(., stu.res = F)
+
+# exploratory by region
+inf_point_data %>% 
+  filter(!is.na(mabs_infection)) %>% 
+  metaprop_formatted(.,
+                     event = mabs_infection) %>%
+  update.meta(.,
+              subgroup = region1,
+              tau.common = F) %>% 
+  forest_wrapper()
+
 ```
 
 
 ## Pre-specified MAC infection prevalence
 
-Using only MABs infection point prevalence (and annual period prevalence)
+Using only MAC infection point prevalence (and annual period prevalence)
 
 ```{r}
 metaprop_formatted(inf_point_data, event = avium_infection) 
@@ -862,11 +903,30 @@ inf_point_data %>%
   metaprop_formatted(., 
                      event = avium_infection) %>%
   forest_wrapper(stu.res = T)
+
+
+# exploratory by regions 
+inf_point_data %>% 
+  filter(!is.na(avium_infection)) %>% 
+  metaprop_formatted(.,
+                     event = avium_infection) %>%
+  update.meta(.,
+              subgroup = region1,
+              tau.common = F) %>% 
+  forest_wrapper(stu.res = F)
+
+# sensitivity last registry only
+inf_point_data %>% 
+  filter(!is.na(avium_infection)) %>% 
+  filter(last.registry_analysis=="yes") %>% 
+  metaprop_formatted(.,
+                     event = avium_infection) %>%
+  update.meta(.,
+              subgroup = region1,
+              tau.common = F) %>% 
+  forest_wrapper()
+
 ```
-
-
-
-
 
 ## Exploratory: multilevel model
 
@@ -947,6 +1007,27 @@ inf_point_data %>%
   
 ```
 
+
+## Exploratory: sample size subgroup
+
+
+```{r}
+table(inf_point_data$size_cat)
+
+# significant difference according to overall RoB appraisal. 
+update.meta(meta.full,
+            subgroup =  size_cat, 
+            tau.common = F)
+
+#  forest plot according ~ category of sample size
+update.meta(meta.full,
+            subgroup = size_cat, 
+            tau.common = F) %>%
+  forest_wrapper(subgroup.name = "Overall Risk of Bias (JBI)")
+
+```
+
+
 ## Exploratory: why such heterogeneity?
 
 We explore microbiological methods and population characteristics as possible differences behind the great heterogeneity in our analyses
@@ -963,6 +1044,10 @@ inf_point_data %>%
 # specimen used
 inf_point_data %>%
   count_prop(ntm_specimen)
+
+# culture method
+inf_point_data %>%
+  count_prop(culture_method)
 
 
 # decontamination
@@ -989,6 +1074,32 @@ inf_point_data %>%
 
 ```
 
+## Exploratory: tendencies among registry reports
+
+
+```{r}
+# ----------------- exploring tendencies inside registries
+
+clean_data %>% 
+  # select point_infection or annual_period studies
+  filter(point_infection_ind == "yes" & is_registry==1) %>%
+  # percentages and calculated prevalence
+  mutate(estimate = case_when(is.na(point_inf_perc) ~ 
+                                (ntm_point_infection / sample_size_cf ) * 100,
+                              TRUE ~ point_inf_perc)) %>% 
+  ggplot(aes(x = first_year_data,
+             y = estimate,
+             group = used_registry,
+             color = used_registry)) +
+  geom_point() +
+  facet_wrap(~ used_registry) +
+  scale_x_continuous(breaks = seq(2010, 2019, 2)) +
+  theme(legend.position = "none",
+        strip.text.x = element_text(size = 13)
+          ) +
+  labs (y = "Annual prevalence estimate (%)",
+        x = "Year")
+```
 
 # Publication bias
 
@@ -1459,15 +1570,20 @@ rob_data %>%
              shape=15) +
   geom_text(aes(label = measurement), 
             size = 6) +
-  theme(axis.text.x = element_text(size=10),
+  theme(axis.text.x = element_text(size=10,
+                                   angle = 45,
+                                   face = "bold"),
         axis.text.y = element_text(size=10))
 ```
 
 Finally, for studies reporting NTM disease period prevalence (n = 9) or point (n = 2) prevalence, I also produce a traffic light plot.
 
 ```{r}
+str(rob_data)
 rob_data %>%
   filter(period_disease_ind =="yes" | point_disease_ind=="yes") %>% 
+  # reverse the order of study levels so when flipped it looks okay
+  mutate(study=reorder(study, desc(study))) %>% 
   select(-ROB_overall) %>% 
   rob.summary2(table = T,
                studies=.$study) %>% 
@@ -1480,9 +1596,88 @@ rob_data %>%
              shape=15) +
   geom_text(aes(label = measurement),
             size = 7) +
-  theme(axis.text.x = element_text(size=13),
+  scale_y_discrete(position = "right", ) +
+  theme(axis.text.x = element_text(size=13, 
+                                   angle = 45,
+                                   face = "bold"),
         axis.text.y = element_text(size=13))
+  
 # adjust to plot space
+```
+
+# Sensitivity analysis using midpoint or last registries
+
+## Last registry only
+```{r}
+
+# overall result
+
+meta_last.registry <- 
+inf_point_data %>% 
+  filter(last.registry_analysis=="yes") %>% 
+  metaprop_formatted()
+forest_wrapper(meta_last.registry)
+
+# subgroup study design
+update.meta(meta_last.registry,
+            subgroup = study_design,
+            tau.common = F) %>%
+  forest_wrapper(data = .,
+                 xlim = c(0, 0.7))
+
+## by region
+update.meta(meta_last.registry,
+            subgroup =  region1, 
+            tau.common = F) %>% 
+  forest_wrapper(data = .,
+                 subgroup.name = "Region",
+                 pred_int = T,
+                 xlim = c(0, 1.05))
+
+## meta regression
+
+inf_point_data %>% 
+  filter(last.registry_analysis=="yes") %>% 
+  metareg_glmm_wrapper(data = .,
+                       covs=~ study_design + size_cat + region1 + before_year) 
+
+```
+
+
+## Midpoint registry only
+```{r}
+
+# overall result
+
+meta_midpoint.registry <- 
+inf_point_data %>% 
+  filter(midpoint_analysis=="yes") %>% 
+  metaprop_formatted()
+forest_wrapper(meta_midpoint.registry)
+
+# subgroup study design
+update.meta(meta_midpoint.registry,
+            subgroup = study_design,
+            tau.common = F) %>%
+  forest_wrapper(data = .,
+                 xlim = c(0, 1.1))
+
+## by region
+update.meta(meta_midpoint.registry,
+            subgroup =  region1, 
+            tau.common = F) %>% 
+  forest_wrapper(data = .,
+                 subgroup.name = "Region",
+                 pred_int = T,
+                 xlim = c(0, 1.05))
+
+## meta regression
+
+inf_point_data %>% 
+  filter(midpoint_analysis=="yes") %>% 
+  metareg_glmm_wrapper(data = .,
+                       covs=~ study_design + size_cat + region1 + before_year) 
+
 ```
 
 
