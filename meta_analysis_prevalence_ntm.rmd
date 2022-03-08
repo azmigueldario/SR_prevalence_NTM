@@ -42,7 +42,8 @@ Load required packages
 
 ```{r, warning=FALSE, message=FALSE}
 # devtools::install_github("MathiasHarrer/dmetar")
-packages <- c("dmetar", "meta", "metafor", "gginnards", "tidyverse", "flextable")
+packages <- c("dmetar", "meta", "metafor", "gginnards",
+              "tidyverse", "flextable")
 lapply(packages, library, character.only=T)
 ```
 
@@ -106,17 +107,7 @@ We create a grouping variable according to the first year of data collection of 
 ```{r date range groups}
 temp$untidy_data<- 
   temp$untidy_data %>%
-  mutate(before_year=case_when(first_year_data<1990 ~ "1990 or before",
-                               first_year_data<=2000 ~ "1990-2000",
-                               first_year_data<=2004 ~ "2001-2004",
-                               first_year_data<=2009 ~ "2005-2009",
-                               first_year_data<=2014 ~ "2010-2014",
-                               TRUE ~ "2015 or after")) 
-
-temp$untidy_data<- 
-  temp$untidy_data %>%
-  mutate(before_year=case_when(first_year_data<1990 ~ "1990 or before",
-                               first_year_data<=2000 ~ "1990-2000",
+  mutate(before_year=case_when(first_year_data<=2000 ~ "2000 or before",
                                first_year_data<=2009 ~ "2000-2009",
                                TRUE ~ "2010-2019")) 
 
@@ -407,15 +398,8 @@ clean_data  %>%
 ## By years of data collection 
 
 ```{r}
-# relevel before_year factor
-#clean_data$before_year<- factor(clean_data$before_year, 
-#                                levels = c("1990 or before", "1990-2000",
-#                                          "2001-2004", "2005-2009",
-#                                           "2010-2014", "2015 or after")) 
-
-## alternative
 clean_data$before_year<- factor(clean_data$before_year, 
-                                levels = c("1990 or before", "1990-2000",
+                                levels = c("2000 or before",
                                            "2000-2009",
                                            "2010-2019")) 
 
@@ -506,6 +490,7 @@ is.na(clean_data$point_inf_perc)
 
 # Infection period prevalence
 
+## Exploratory analyses
 We will summarize:
 * number of studies reporting period prevalence
 * regions were they come from
@@ -718,7 +703,7 @@ update.meta(meta.full,
             subgroup = before_year,
             tau.common = F) %>%
   forest_wrapper(data = .,
-                 pred_int = F,
+                 pred_int = T,
                  xlim = c(0, 1),
                  subgroup.name = "First year of data collection")
 
@@ -746,7 +731,8 @@ update.meta(meta.full,
   forest_wrapper(data = .,
                  subgroup.name = "Region",
                  pred_int = T,
-                 xlim = c(0, 0.5))
+                 xlim = c(0, 0.5)) +
+  geom_hline(0,3)
     
 ```
 
@@ -768,7 +754,7 @@ We use `metafor::rma.uni` function to fit the meta-analyses and indicate the mod
 inf_point_data <- 
   inf_point_data %>% 
   mutate(region1 = relevel(region1, ref = "NA"),
-         before_year = relevel(before_year, ref = "2015 or after"),
+         before_year = relevel(before_year, ref = "2010-2019"),
          study_design = relevel(study_design, ref = "Registry report"),
          size_cat = relevel(size_cat, ref = "large"),
          age_group =  factor(age_group, levels = c("mixed", "pediatric", "adult")))
@@ -820,7 +806,7 @@ metareg_glmm_wrapper(covs=~ study_design + size_cat + region1 + before_year) %>%
 # selected model 
 
 metareg <- 
-metareg_glmm_wrapper(covs=~ study_design + size_cat + region1 + first_year_data) 
+metareg_glmm_wrapper(covs=~ study_design + size_cat + region1 + before_year) 
 
 ```
 
@@ -829,13 +815,11 @@ Finally, we produce a table of the model coefficients and calculate the change i
 ```{r}
 # create vector with formatted names for coefficients
 temp$coef.names <- c("Intercept", 
-                     "Design: cross-sectional", "Design: cohort", 
-                     "Sample size < 1000", "Sample size = 1000 - 3000",
+                     "Design: Cross-sectional (non-registry)",
+                     "Design: cohort", "Sample size < 1000",
+                     "Sample size 1000 - 3000",
                      "European region", "Other regions",
-                     "Before year 2000", "2001 - 2004", "2005 - 2009",
-                     "2010 - 2014")
-
-
+                     "Before year 2000", "2000 - 2009")
 
 # ----------------flextable
 
@@ -853,15 +837,15 @@ summary(metareg) %>%
 
 # --------- estimates calculation
 # baseline
-transf.ilogit(-2.352)
+transf.ilogit(-2.536)
 # sample size < 1000
-transf.ilogit(-2.352 + 0.9963)
+transf.ilogit(-2.536 + 1.2313)
 # europe
-transf.ilogit(-2.352 - 0.9337)
+transf.ilogit(-2.536 + -0.9004)
 # other regions
-transf.ilogit(-2.352 - 2.1255)
+transf.ilogit(-2.536 - 2.0735)
 # before 2000
-transf.ilogit(-2.352 - 1.3316)
+transf.ilogit(-2.536 - 1.1179)
 
 ```
 
@@ -1625,6 +1609,14 @@ update.meta(meta_last.registry,
   forest_wrapper(data = .,
                  xlim = c(0, 0.7))
 
+# years of data collection
+update.meta(meta_last.registry,
+            subgroup = before_year,
+            tau.common = F) %>%
+  forest_wrapper(data = .,
+                 xlim = c(0, 0.7))
+
+
 ## by region
 update.meta(meta_last.registry,
             subgroup =  region1, 
@@ -1661,6 +1653,13 @@ update.meta(meta_midpoint.registry,
             tau.common = F) %>%
   forest_wrapper(data = .,
                  xlim = c(0, 1.1))
+
+# years of data collection
+update.meta(meta_midpoint.registry,
+            subgroup = before_year,
+            tau.common = F) %>%
+  forest_wrapper(data = .,
+                 xlim = c(0, 0.7))
 
 ## by region
 update.meta(meta_midpoint.registry,
