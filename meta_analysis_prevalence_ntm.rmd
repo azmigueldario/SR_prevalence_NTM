@@ -88,8 +88,8 @@ temp$untidy_data<-
          design_or_registry= case_when(study_design=="Registry report" | 
                                          used_registry!="no" ~ "Registry report/used registry",
                                        TRUE ~ study_design),
-         is_registry=case_when(study_design=="Registry report" ~ 1,
-                               TRUE ~ 0),
+         is_registry=case_when(study_design=="Registry report" ~ "Registry",
+                               TRUE ~ "Not registry"),
          size_cat = case_when(sample_size_cf <= 1000 ~ "small",
                               sample_size_cf <= 3000 ~ "medium",
                               sample_size_cf > 3000 ~ "large"),
@@ -160,13 +160,13 @@ To conduct a sensitivity analysis based on overall risk of bias, we created the 
 ```{r}
 # save names of QA variables
 temp$ROBcolnames<- 
-  select(temp$untidy_data, contains("Q")) %>%
+  select(temp$untidy_data, matches("Q[0-9]")) %>%
   colnames(); temp$ROBcolnames
 
 temp$untidy_data <- 
   temp$untidy_data %>% 
   # shorten the names of QA variables
-  rename_with(.cols = contains("Q"), 
+  rename_with(.cols = matches("Q[0-9]"), 
               ~ gsub("^(Q[0-9]).*","\\1", .x)) %>%
   mutate(Overall_risk=
            case_when(# definition of high risk ,
@@ -346,19 +346,19 @@ forest_wrapper <- function(data,
 
 The dataset includes only raw numbers, percentages without raw numbers were not included. 
 
-- **NTM disease** period prevalence = 15 
+- **NTM disease** period prevalence = 13 
 - **NTM disease** point prevalence = 2
-- **NTM infection** period prevalence = 50 (15 not reporting point/annual prevalence)
+- **NTM infection** only period prevalence = 43
 
-- **NTM infection** point/annual prevalence = 68 (including those only reporting %)
-- **NTM infection** incidence proportion = 4
+- **NTM infection** point/annual prevalence = 67 (including those only reporting %)
+- **NTM infection** incidence proportion = 5
 
 ```{r}
 # point/annual prevalence
 clean_data %>% 
   # include also those with only percentage reported
   filter(point_infection_ind == "yes" | annual_period_ind =="yes") %>% 
-  # 57 report point_infection and remaining 11 annual period_infection
+  # 57 report point_infection and remaining 10 annual period_infection
   count(point_infection_ind, annual_period_ind)
 
 # other outcomes
@@ -415,7 +415,7 @@ clean_data  %>%  count_table(before_year)
 
 # barplot of data collection
 clean_data %>% 
-  filter(is_registry==0) %>%
+  filter(is_registry=="Not registry") %>%
   ggplot(aes(x=before_year, fill=factor(before_year)))+
   geom_bar() +
   labs(title= "Frequency of studies by date of data collection",
@@ -623,6 +623,8 @@ clean_data %>%
     - `all_ntm_infection` which contains the number of events
     - `sample_size_cf` especifies the CF population
 * For analysis, we create a dataset that includes only the set of studies to analyze
+    - Excludes studies that used registry data to avoid duplication
+    - Uses only last registry of every region to avoid over-representation too
 
 ```{r}
 inf_point_data <-  
@@ -630,8 +632,16 @@ inf_point_data <-
   # select point_infection or annual_period studies
   filter(point_infection_ind == "yes" | annual_period_ind =="yes") %>% 
   # drop_na
-  drop_na(ntm_point_infection)
-# n= 58
+  drop_na(ntm_point_infection) %>% 
+  # drop studies that used registry data (duplicate the data)
+  filter(!(is_registry!="Registry" & used_registry !="no")) %>% 
+  # include only last registry report per country
+  filter(last.registry_analysis=="yes")
+  
+  
+# n = 21
+# n =  4 were cohort studies using registry data
+# n = 34 registry studies over-represented
 ```
 
 In a meta-analysis including all studies, there is high heterogeneity. All observations cannot be plotted.  
@@ -646,10 +656,12 @@ forest_wrapper(meta.full)
 To produce subgroups we update `full.meta` according to a variable and then pass it to our `forest_wrapper` function to produce nice forest plots
 
 ```{r}
-# Subgroup test is significant but not relevant change (98.3 vs 99.7)
+# Subgroup test is not significant but close (0.07)
 update.meta(meta.full,
             subgroup = is_registry,
-            tau.common = F)
+            subgroup.name = "registry",
+            tau.common = F) %>% 
+  forest_wrapper()
 
 # forest plot for subgroup analysis by study_design
 update.meta(meta.full,
@@ -718,7 +730,7 @@ inf_point_data %>%
 
 ```
 
-We see reduced heterogeneity in the groups before 2000, 2001 - 2004 and 2005 - 2009. This difference is statistically significant. 
+Once we removed over-represented registry studies, no significant differences. 
 
 ## Subgroup: regions (continents)
 
@@ -731,8 +743,7 @@ update.meta(meta.full,
   forest_wrapper(data = .,
                  subgroup.name = "Region",
                  pred_int = T,
-                 xlim = c(0, 0.5)) +
-  geom_hline(0,3)
+                 xlim = c(0, 0.5)) 
     
 ```
 
@@ -837,15 +848,11 @@ summary(metareg) %>%
 
 # --------- estimates calculation
 # baseline
-transf.ilogit(-2.536)
+transf.ilogit(-3.1483)
 # sample size < 1000
-transf.ilogit(-2.536 + 1.2313)
-# europe
-transf.ilogit(-2.536 + -0.9004)
+transf.ilogit(-3.1483 + 1.7381)
 # other regions
-transf.ilogit(-2.536 - 2.0735)
-# before 2000
-transf.ilogit(-2.536 - 1.1179)
+transf.ilogit(-3.1483 - 1.1369)
 
 ```
 
@@ -854,13 +861,14 @@ transf.ilogit(-2.536 - 1.1179)
 Using only MABs infection point prevalence (and annual period prevalence)
 
 ```{r}
-metaprop_formatted(inf_point_data, event = mabs_infection) 
+metaprop_formatted(inf_point_data, 
+                   event = mabs_infection) 
 
 inf_point_data %>% 
   filter(!is.na(mabs_infection)) %>% 
   metaprop_formatted(.,
                      event = mabs_infection) %>%
-  forest_wrapper(., stu.res = F)
+  forest_wrapper(., stu.res = T)
 
 # exploratory by region
 inf_point_data %>% 
@@ -880,7 +888,8 @@ inf_point_data %>%
 Using only MAC infection point prevalence (and annual period prevalence)
 
 ```{r}
-metaprop_formatted(inf_point_data, event = avium_infection) 
+metaprop_formatted(inf_point_data, 
+                   event = avium_infection) 
 
 inf_point_data %>% 
   filter(!is.na(avium_infection)) %>% 
@@ -899,17 +908,6 @@ inf_point_data %>%
               tau.common = F) %>% 
   forest_wrapper(stu.res = F)
 
-# sensitivity last registry only
-inf_point_data %>% 
-  filter(!is.na(avium_infection)) %>% 
-  filter(last.registry_analysis=="yes") %>% 
-  metaprop_formatted(.,
-                     event = avium_infection) %>%
-  update.meta(.,
-              subgroup = region1,
-              tau.common = F) %>% 
-  forest_wrapper()
-
 ```
 
 ## Exploratory: multilevel model
@@ -920,7 +918,7 @@ We explored inner collinerarity among registry studies in a multi-level meta-ana
     +`random = ~ 1 | a/b` specifies b nested in a
     +`random = ~ a | b ` specifies that a = inner group and b = outer group
 
-```{r}
+```{r, eval=FALSE}
 # table(inf_point_data$used_registry)
 
 multilvl.meta <- 
@@ -948,7 +946,7 @@ transf.ilogit(-3.3392)
 
 What percentage of the variance is explained by level of our hierarchical model. Level 3 groups according to registry. 
 
-```{r}
+```{r, eval=FALSE}
 var.comp(multilvl.meta)$results %>%
   mutate(Vars = c("Individual level", "Study/registry", "Registry"),
          n_groups = c("--", "73", "6"),
@@ -992,7 +990,7 @@ inf_point_data %>%
 ```
 
 
-## Exploratory: sample size subgroup
+## Exploratory: sample size
 
 
 ```{r}
@@ -1018,6 +1016,14 @@ We explore microbiological methods and population characteristics as possible di
 
 ```{r}
 
+#------------------------- dataset including all point/annual prevalence
+
+inf_point_data_all <-  
+  clean_data %>% 
+  # select point_infection or annual_period studies
+  filter(point_infection_ind == "yes" | annual_period_ind =="yes")
+
+
 #------------------------- Microbiological methods
 
 # reported both specimen and culture methods
@@ -1028,11 +1034,16 @@ inf_point_data %>%
 # specimen used
 inf_point_data %>%
   count_prop(ntm_specimen)
+# specimen in all NTM infection point/annual
+inf_point_data_all %>%
+  count_prop(ntm_specimen)
 
 # culture method
 inf_point_data %>%
   count_prop(culture_method)
-
+# culture method in all NTM infection point/annual
+inf_point_data_all %>%
+  count_prop(culture_method)
 
 # decontamination
 inf_point_data %>% 
@@ -1052,9 +1063,16 @@ inf_point_data %>%
 is.na(inf_point_data$females_perc) %>%  sum()
 quantile(inf_point_data$females_perc, na.rm = T)
 
+#------------------------- testing frequency
+
 inf_point_data %>% 
   count_prop(testing_freq)
 
+# sensitivity analysis without preece2016
+inf_point_data %>% 
+  filter(!str_detect(id, "preece")) %>% 
+  metaprop_formatted() %>% 
+  forest_wrapper()
 
 ```
 
@@ -1065,7 +1083,7 @@ inf_point_data %>%
 # ----------------- exploring tendencies inside registries
 
 clean_data %>% 
-  # select point_infection or annual_period studies
+  # select registries
   filter(point_infection_ind == "yes" & is_registry==1) %>%
   # percentages and calculated prevalence
   mutate(estimate = case_when(is.na(point_inf_perc) ~ 
@@ -1100,7 +1118,7 @@ funnel(x = metafor.full,
        atransf = transf.ilogit,
        col = "darkblue") 
 
-metareg_data$used_registry
+inf_point_data$used_registry
 
 # excluding US registry reports
 rma.glmm(xi = ntm_point_infection,
@@ -1676,6 +1694,28 @@ inf_point_data %>%
   filter(midpoint_analysis=="yes") %>% 
   metareg_glmm_wrapper(data = .,
                        covs=~ study_design + size_cat + region1 + before_year) 
+
+```
+
+# Exclude studies that used registry data 
+
+
+```{r}
+# overall result
+inf_point_data %>% 
+  filter(study_design!="Registry report" & used_registry !="no") %>% 
+  metaprop_formatted() %>% 
+forest_wrapper()
+
+# subgroup study design
+inf_point_data %>% 
+  filter(study_design=="Registry report" | used_registry !="no") %>% 
+  metaprop_formatted() %>%
+update.meta(.,
+            subgroup = study_design,
+            tau.common = F) %>%
+  forest_wrapper(data = .,
+                 xlim = c(0, 1.1))
 
 ```
 
