@@ -18,7 +18,6 @@
 /*.Rcheck/
 
 # RStudio files
-.Rproj.user/
 
 # produced vignettes
 vignettes/*.html
@@ -39,7 +38,6 @@ vignettes/*.pdf
 .Renviron
 
 # Prevent users to commit their own .RProj
-*.Rproj
 
 # Temporary files
 *~
@@ -56,3 +54,4 @@ vignettes/*.pdf
 *README.html
 *README_cache/
 #*README_files/
+.Rproj.user
