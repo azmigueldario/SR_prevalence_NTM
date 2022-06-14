@@ -317,7 +317,7 @@ forest_wrapper <- function(data,
   
   forest.meta(x=data,
               sortvar = sort.var,
-              predict = pred_int,
+              prediction = pred_int,
               comb.fixed = F,
               layout="RevMan5",
               print.I2.ci = T,
@@ -691,7 +691,7 @@ Separated forest plots for registry studies and observational studies
 ```{r}
 # forest plots of registry studies with raw numbers (numerator/denominator)
 inf_point_data %>%
-  filter (is_registry == 1) %>%
+  filter (is_registry == "Registry") %>%
   metaprop_formatted(data = .) %>%
   forest_wrapper(data = .,
                  stu.res = T,
@@ -699,7 +699,7 @@ inf_point_data %>%
 
 # only observational studies that did not use registry data
 inf_point_data %>%
-  filter (is_registry == 0) %>%
+  filter (is_registry == "Not registry") %>%
   metaprop_formatted(data = .) %>%
   forest_wrapper(data = .,
                  stu.res = T,
@@ -721,7 +721,7 @@ update.meta(meta.full,
 
 
 inf_point_data %>% 
-  filter(is_registry==0) %>% 
+  filter(is_registry=="Not registry") %>% 
   metaprop_formatted() %>% 
   update.meta(.,
               subgroup = before_year,
@@ -742,7 +742,6 @@ update.meta(meta.full,
             tau.common = F) %>% 
   forest_wrapper(data = .,
                  subgroup.name = "Region",
-                 pred_int = T,
                  xlim = c(0, 0.5)) 
     
 ```
@@ -783,7 +782,6 @@ metafor.full <-
            data = inf_point_data,
            method = "ML",
            measure = "PLO")
-
 
 meta.full$TE.random %>% transf.ilogit()
 coef(metafor.full) %>% transf.ilogit()
@@ -878,7 +876,7 @@ inf_point_data %>%
   update.meta(.,
               subgroup = region1,
               tau.common = F) %>% 
-  forest_wrapper()
+  forest_wrapper(xlim = c(0, 0.2))
 
 ```
 
@@ -906,7 +904,7 @@ inf_point_data %>%
   update.meta(.,
               subgroup = region1,
               tau.common = F) %>% 
-  forest_wrapper(stu.res = F)
+  forest_wrapper(stu.res = F, xlim = c(0, 0.2))
 
 ```
 
@@ -1065,7 +1063,14 @@ quantile(inf_point_data$females_perc, na.rm = T)
 
 #------------------------- testing frequency
 
-inf_point_data %>% 
+inf_point_data %>% # included in meta-analysis
+  count_prop(testing_freq)
+inf_point_data_all %>% # all studies
+  count_prop(testing_freq)
+
+# by study type
+clean_data %>%
+  group_by(is_registry) %>% 
   count_prop(testing_freq)
 
 # sensitivity analysis without preece2016
@@ -1074,6 +1079,7 @@ inf_point_data %>%
   metaprop_formatted() %>% 
   forest_wrapper()
 
+colnames(inf_point_data_all)
 ```
 
 ## Exploratory: tendencies among registry reports
@@ -1084,7 +1090,7 @@ inf_point_data %>%
 
 clean_data %>% 
   # select registries
-  filter(point_infection_ind == "yes" & is_registry==1) %>%
+  filter(point_infection_ind == "yes" & is_registry=="Registry") %>%
   # percentages and calculated prevalence
   mutate(estimate = case_when(is.na(point_inf_perc) ~ 
                                 (ntm_point_infection / sample_size_cf ) * 100,
@@ -1103,7 +1109,7 @@ clean_data %>%
         x = "Year")
 ```
 
-# Publication bias
+# Publication bias and Risk of bias assessment
 
 ## Funnel plots
 
@@ -1118,7 +1124,7 @@ funnel(x = metafor.full,
        atransf = transf.ilogit,
        col = "darkblue") 
 
-inf_point_data$used_registry
+metabias(meta.full, method.bias = "peters")
 
 # excluding US registry reports
 rma.glmm(xi = ntm_point_infection,
@@ -1137,7 +1143,7 @@ rma.glmm(xi = ntm_point_infection,
 
 ```
 
-# Risk of bias appraissal
+## Risk of bias wrangling
 
 We will summarize the Quality assessment recorded from the Joanna Briggs tool. Unfortunately, there is no easy way to plot this in R and we have to create a new dataframe that fulfills the requirements of the available tools:
 
@@ -1157,14 +1163,12 @@ First, we select only the variables that contain quality assessment data and tra
 ```{r}
 rob_data <- 
   clean_data %>% 
-  # match to select RoB questions and outcome_indicator variables
+  # select RoB questions and outcome_indicator variables
   select(study, matches("Q[0-9]|ind"), Overall_risk, study_design,
          before_year) %>% 
   rename(ROB_overall=Overall_risk) %>% 
   as.data.frame() 
 ```
-
-## Exploratory: unclear proportion
 
 ```{r}
 count_prop(rob_data, Q6_Identification_methods)
@@ -1697,23 +1701,16 @@ inf_point_data %>%
 
 ```
 
-# Exclude studies that used registry data 
-
+## Exclude studies that used registry data 
 
 ```{r}
-# overall result
-inf_point_data %>% 
-  filter(study_design!="Registry report" & used_registry !="no") %>% 
-  metaprop_formatted() %>% 
-forest_wrapper()
-
 # subgroup study design
 inf_point_data %>% 
-  filter(study_design=="Registry report" | used_registry !="no") %>% 
+  filter(study_design=="Registry report" | used_registry =="no") %>% 
   metaprop_formatted() %>%
-update.meta(.,
-            subgroup = study_design,
-            tau.common = F) %>%
+  update.meta(.,
+              subgroup = is_registry,
+              tau.common = F) %>%
   forest_wrapper(data = .,
                  xlim = c(0, 1.1))
 
