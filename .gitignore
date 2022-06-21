@@ -55,3 +55,9 @@ vignettes/*.pdf
 *README_cache/
 #*README_files/
 .Rproj.user
+
+# Do not synchronize image files produced 
+*.tiff
+*.eps
+*.jpg
+*.jpeg
