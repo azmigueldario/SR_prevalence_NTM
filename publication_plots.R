@@ -526,11 +526,11 @@ pub_data %>%
 dev.off()}
 
 #########################################################################
-###                   Other plots for manuscript 
+###                   Supplementary figures
 #########################################################################
 
 
-### Funnel plot at 300 dpi using Cairo
+### ------------ Funnel plot at 300 dpi using Cairo
 
 {tiff(filename = "FigS4.tiff",
      width = 120,
@@ -549,7 +549,7 @@ funnel(x = metafor.full,
        col = "darkblue")
 dev.off()}
 
-### Boxplots plot at 300 dpi using Cairo
+### ------------ Boxplots plot at 300 dpi using Cairo
 
 tiff(filename = "FigS5.tiff",
       width = 140,
@@ -577,7 +577,7 @@ temp$period_infection %>%
          y = "Prevalence estimate (%)\n")
 dev.off()
 
-### Plot of tendency estimates for each registry 
+### ------------ Plot of tendency estimates for each registry 
 
 tiff(filename = "FigS6.tiff",
      width = 160,
@@ -617,7 +617,74 @@ clean_data %>%
         axis.title.y = element_text(size = 13))
 dev.off()
 
-########## Concatenate pictures using the command line
+
+### ------------ Supplementary figure 3
+
+### Subgroup analysis by region of MABs meta-analysis
+
+{tiff(filename = "FigS3a.tiff",
+     width = 240,
+     height = 80,
+     units = "mm",
+     pointsize = 10, # size of text
+     res = 300, # desired dpi
+     type = "cairo", # specify use of Cairo
+     compression = "lzw" # to reduce size
+)
+  inf_point_data %>% 
+    filter(!is.na(mabs_infection)) %>% 
+    metaprop_formatted(.,
+                       event = mabs_infection) %>%
+    update.meta(.,
+                subgroup = region1,
+                tau.common = F) %>% 
+    forest_wrapper(xlim = c(0, 0.2))
+  dev.off()}
+
+### Subgroup analysis by region of MAC meta-analysis
+
+{tiff(filename = "FigS3b.tiff",
+      width = 240,
+      height = 80,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
+)
+  inf_point_data %>% 
+    filter(!is.na(avium_infection)) %>% 
+    metaprop_formatted(.,
+                       event = avium_infection) %>%
+    update.meta(.,
+                subgroup = region1,
+                tau.common = F) %>% 
+    forest_wrapper(stu.res = F, xlim = c(0, 0.2))
+  dev.off()}
+
+### Sensitivity analysis of main meta-analysis without Preece 2016
+
+{tiff(filename = "FigS3c.tiff",
+      width = 240,
+      height = 40,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
+)
+  # sensitivity analysis without preece2016
+  inf_point_data %>% 
+    filter(!str_detect(id, "preece")) %>% 
+    metaprop_formatted() %>% 
+    forest_wrapper()
+  dev.off()}
+
+#########################################################################
+####       Concatenate pictures using the command line
+#########################################################################
+
+
 # brew install imagemagick
 
 # ------------- concatenate horizontally
@@ -626,3 +693,13 @@ dev.off()
 # ------------- concatenate vertically
 # convert -append img1 img2
 
+summary(metareg) %>%
+  coef() %>%
+  mutate(Coefs = temp$coef.names, .before = 1,
+         zval = NULL) %>%
+  # specify names of columns
+  flextable_wrapper(names_col = c("Coefficients",  "LOGIT-estimate", "Std. error",
+                                  "p.value", "CI-lower", "CI-upper"),
+                    digits = 3) %>% 
+  bold(i= ~ p.value <0.05 & Coefficients!="Intercept", part = "body") %>% 
+  print(., preview = "docx")
