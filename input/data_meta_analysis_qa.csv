@@ -28,13 +28,13 @@ brazil2017,NA,Registry report,3378,LAC,Brazil,Brazil,mixed,NA,NA,NA,9,2017,2017,
 campos-herrero2016,2016,Cross-sectional study,44, EUR,Spain,no,mixed,7,1,10,18,2002,2012,10,44,Yes,Yes ,No ,No,Missing,Yes,Yes,Yes,Yes,yes,yes,no,yes,yes,no,44,18,NA,NA,NA,NA,sputum,yes,MGIT & L-J,yes,yes
 canada2011,NA,Registry report,3913, NAM,Canada,Canada,mixed,NA,NA,NA,91,2011,2011,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.473,NA,NA,NA,NA,no,no
 canada2012,2014,Registry report,3975, NAM,Canada,Canada,mixed,NA,NA,NA,109,2012,2012,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.4709,NA,NA,NA,NA,no,no
-canada2013,2015,Registry report,4077, NAM,Canada,Canada,mixed,NA,NA,NA,116,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.4709,NA,NA,NA,NA,yes,yes
-canada2014,2016,Registry report,4128, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,3.5,NA,0.469,NA,NA,NA,NA,no,no
-canada2015,2017,Registry report,4192, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,3.9,NA,0.471,NA,NA,NA,NA,no,no
-canada2016,2017,Registry report,4246, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,4.5,NA,0.464,NA,NA,NA,NA,no,no
-canada2017,2018,Registry report,4309, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6.5,NA,0.461,NA,NA,NA,NA,no,no
-canada2018,2019,Registry report,4371, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2018,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6.1,NA,0.465,NA,NA,NA,NA,no,no
-canada2019,2020,Registry report,4344, NAM,Canada,Canada,mixed,NA,NA,NA,NA,2019,2019,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6,NA,0.466,NA,NA,NA,NA,no,no
+canada2013,2015,Registry report,4077, NAM,Canada,Canada,mixed,NA,NA,NA,116,2013,2013,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,NA,NA,0.4709,NA,NA,NA,NA,no,no
+canada2014,2016,Registry report,4128, NAM,Canada,Canada,mixed,NA,NA,NA,144,2014,2014,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,3.5,NA,0.469,NA,NA,NA,NA,no,no
+canada2015,2017,Registry report,4192, NAM,Canada,Canada,mixed,NA,NA,NA,163,2015,2015,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,3.9,NA,0.471,NA,NA,NA,NA,yes,no
+canada2016,2017,Registry report,4246, NAM,Canada,Canada,mixed,NA,NA,NA,191,2016,2016,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,4.5,NA,0.464,NA,NA,NA,NA,no,no
+canada2017,2018,Registry report,4309, NAM,Canada,Canada,mixed,NA,NA,NA,280,2017,2017,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6.5,NA,0.461,NA,NA,NA,NA,no,no
+canada2018,2019,Registry report,4371, NAM,Canada,Canada,mixed,NA,NA,NA,267,2018,2018,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6.1,NA,0.465,NA,NA,NA,NA,no,no
+canada2019,2020,Registry report,4344, NAM,Canada,Canada,mixed,NA,NA,NA,261,2019,2019,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Yes,Unclear,No ,Unclear,no,no,no,no,yes,no,NA,NA,6,NA,0.466,NA,NA,NA,NA,no,yes
 candido2014,2014,Cross-sectional study,129,LAC,Brazil,no,NA,8,1,1,10,2009,2012,1,129,Yes,Yes ,No ,No,Missing,Unclear,Unclear,Yes,Unclear,yes,yes,no,no,no,no,129,10,NA,NA,NA,NA,sputum,yes,L-J,yes,yes
 cavalli2017,2017,Cohort study (retrospective),401, EUR,France,no,mixed,18,27,4,48,2009,2014,15,4013,Yes,Yes ,Yes ,No,Missing,No ,Yes,Yes,Unclear,yes,yes,no,no,no,no,401,48,NA,NA,NA,annual,sputum,NA,NA,yes,yes
 ecfs2010,NA,Registry report,22358, EUR,Multiple in Europe,ECFS,mixed,NA,NA,NA,420,2010,2010,NA,NA,Yes,Yes ,Yes ,Yes,Missing,Unclear,No,Yes,No ,no,no,no,no,yes,no,NA,NA,NA,NA,0.477,NA,NA,NA,NA,no,no
