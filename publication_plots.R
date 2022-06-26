@@ -14,303 +14,6 @@ rob_data2 <- select(rob_data, -matches("Q5"))
 colnames(rob_data2) <- str_replace(string = colnames(rob_data2), 
                                    pattern = "Q([0-9])_", 
                                    replacement = "\\1) ")
-# Modify the Robvis rob.summary function to improve colors and sizes
-rob.summary2 = function(data,
-                        name.high="High",
-                        name.unclear="Unclear",
-                        name.low="Low",
-                        studies,
-                        name.missing,
-                        table = FALSE){
-  
-  # Class Checks
-  if (class(data) != "data.frame"){
-    stop("'data' must be of class 'data.frame'.")
-  }
-  
-  
-  if (missing(name.missing)){
-    
-    # Only select columns with RoB data
-    
-    colnames.rob = character()
-    
-    for (i in 1:ncol(data)){
-      
-      vect = as.character(data[,i])
-      
-      for (j in 1:length(data[,i])){
-        
-        if (vect[j] %in% c(name.high, name.unclear, name.low)){
-          
-          colnames.rob[i] = TRUE
-          
-        } else {
-          
-          colnames.rob[i] = FALSE
-          message(cat("Column '", colnames(data)[i],
-                      "' removed from plot because it did not contain the specified RoB ratings (only). \n",
-                      sep=""))
-          break
-          
-        }
-      }
-    }
-    
-    # Use mask: rob data
-    rob = data[ , as.logical(colnames.rob)]
-    
-    # Relevel for plot
-    for (i in 1:ncol(rob)){
-      
-      rob[,i] = as.character(rob[,i])
-      rob[rob[,i]==name.high,i] = "High"
-      rob[rob[,i]==name.unclear,i] = "Unclear"
-      rob[rob[,i]==name.low,i] = "Low"
-      
-    }
-    
-    # Make table
-    if (table == TRUE){
-      
-      if (missing(studies)){
-        stop("'studies' has to be specified when 'table = TRUE'.")
-      }
-      
-      if (length(as.vector(studies)) != nrow(data)){
-        stop("'studies' vector is not of equal length as the data.")
-      }
-      
-      if (length(unique(studies)) != length(studies)){
-        stop("'studies' cannot contain duplicate study labels.")
-      }
-      
-      robby = rob
-      robby = data.frame(study = studies,
-                         condition = rep(colnames(robby), each = length(studies)),
-                         measurement = unlist(robby))
-      rownames(robby) = NULL
-      robby$condition = gsub("_"," ", robby$condition)
-      robby$condition = gsub("-"," ", robby$condition)
-      robby$condition = gsub("\\."," ", robby$condition)
-      robby[robby$measurement=="Low", "measurement"] = "+"
-      robby[robby$measurement=="Unclear", "measurement"] = "?"
-      robby[robby$measurement=="High", "measurement"] = "-"
-      
-      # Order factor
-      robby$study = factor(robby$study,
-                           levels = unique(studies)[rev(order(unique(robby$study)))])
-      
-      
-      rob.table = ggplot(data = robby, aes(y = study, x = condition)) +
-        geom_tile(color="black", fill="white", size = 0.8) +
-        geom_point(aes(color=as.factor(measurement)), size=20) +
-        geom_text(aes(label = measurement), size = 12) +
-        scale_x_discrete(position = "top") +
-        scale_color_manual(values = c("?" = "#E2DF07",
-                                      "-" = "#BF0000",
-                                      "+" = "#02C100")) +
-        theme_minimal() +
-        coord_equal() +
-        theme(axis.title.x = element_blank(),
-              axis.title.y = element_blank(),
-              axis.ticks.y = element_blank(),
-              axis.text.y = element_text(size = 15, color = "black"),
-              axis.text.x = element_text(size = 13, color = "black", angle = 90, hjust=0),
-              legend.position = "none",
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              panel.background = element_blank())
-      
-    }
-    
-    # Make long format, clean the factors
-    rob.long = data.frame(condition = rep(colnames(rob), each = nrow(rob)),
-                          measurement = unlist(rob))
-    rownames(rob.long) = NULL
-    rob.long$condition = gsub("_"," ",rob.long$condition)
-    rob.long$condition = gsub("-"," ",rob.long$condition)
-    rob.long$condition = gsub("\\."," ",rob.long$condition)
-    rob.long$measurement = as.factor(rob.long$measurement)
-    rob.long$measurement = factor(rob.long$measurement, levels(rob.long$measurement)[c(1, 3, 2)])
-    
-    # Make plot
-    rob.plot = ggplot(data = rob.long) +
-      geom_bar(mapping = aes(x = condition, fill = measurement), width = 0.7,
-               position = "fill", color = "black") +
-      coord_flip(ylim = c(0, 1)) +
-      guides(fill = guide_legend(reverse = TRUE)) +
-      scale_fill_manual("Risk of Bias",
-                        labels = c("    Unclear risk of bias       ",
-                                   "    High risk of bias          ",
-                                   "    Low risk of bias  "),
-                        values = c(Unclear = "#E2DF07", High = "#BF0000", Low = "#02C100")) +
-      scale_y_continuous(labels = scales::percent) +
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            axis.ticks.y = element_blank(),
-            axis.text.y = element_text(size = 54, color = "black"),
-            axis.line.x = element_line(colour = "black", size = 0.5, linetype = "solid"),
-            legend.position = "bottom",
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            panel.background = element_blank(),
-            legend.background = element_rect(linetype = "solid", colour = "black"),
-            legend.title = element_blank(),
-            legend.key.size = unit(0.75, "cm"),
-            legend.text = element_text(size = 14))
-    
-    plot(rob.plot)
-    
-    if (table == TRUE){
-      plot(rob.table)
-    }
-    
-  } else {
-    
-    # Only select columns with RoB data
-    data = as.data.frame(data)
-    
-    colnames.rob = character()
-    
-    for (i in 1:ncol(data)){
-      
-      vect = as.character(data[,i])
-      
-      for (j in 1:length(data[,i])){
-        
-        if (vect[j] %in% c(name.high, name.unclear, name.low, name.missing)){
-          
-          colnames.rob[i] = TRUE
-          
-        } else {
-          
-          colnames.rob[i] = FALSE
-          message(cat("Column '", colnames(data)[i],
-                      "' removed from plot because it did not contain the specified RoB ratings (only). \n",
-                      sep=""))
-          break
-          
-        }
-      }
-    }
-    
-    # Use mask: rob data
-    rob = data[ , as.logical(colnames.rob)]
-    
-    # Relevel for plot
-    for (i in 1:ncol(rob)){
-      
-      rob[,i] = as.character(rob[,i])
-      rob[rob[,i]==name.high,i] = "High"
-      rob[rob[,i]==name.unclear,i] = "Unclear"
-      rob[rob[,i]==name.low,i] = "Low"
-      rob[rob[,i]==name.missing,i] = "Missing"
-      
-    }
-    
-    # Make Table
-    
-    if (table == TRUE){
-      
-      if (missing(studies)){
-        stop("'studies' has to be specified when 'table = TRUE'.")
-      }
-      
-      if (length(as.vector(studies)) != nrow(data)){
-        stop("'studies' vector is not of equal length as the data.")
-      }
-      
-      robby = rob
-      robby = data.frame(study = as.factor(studies),
-                         condition = rep(colnames(robby), each = length(studies)),
-                         measurement = unlist(robby))
-      rownames(robby) = NULL
-      robby$condition = gsub("_"," ", robby$condition)
-      robby$condition = gsub("-"," ", robby$condition)
-      robby$condition = gsub("\\."," ", robby$condition)
-      robby[robby$measurement=="Low", "measurement"] = "+"
-      robby[robby$measurement=="Unclear", "measurement"] = "?"
-      robby[robby$measurement=="High", "measurement"] = "-"
-      robby[robby$measurement=="Missing", "measurement"] = " "
-      
-      # Order factor
-      robby$study = factor(robby$study,
-                           levels = unique(studies)[rev(order(unique(robby$study)))])
-      
-      rob.table = ggplot(data = robby, aes(y = study, x = condition)) +
-        geom_tile(color="black", fill="white", size = 0.8) +
-        geom_point(aes(color=as.factor(measurement)), size=20) +
-        geom_text(aes(label = measurement), size = 8) +
-        scale_x_discrete(position = "top") +
-        scale_color_manual(values = c("?" = "#E2DF07",
-                                      "-" = "#BF0000",
-                                      "+" = "#02C100",
-                                      " " = "white")) +
-        theme_minimal() +
-        coord_equal() +
-        theme(axis.title.x = element_blank(),
-              axis.title.y = element_blank(),
-              axis.ticks.y = element_blank(),
-              axis.text.y = element_text(size = 15, color = "black"),
-              axis.text.x = element_text(size = 13, color = "black", angle = 90, hjust=0),
-              legend.position = "none",
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              panel.background = element_blank())
-      
-    }
-    
-    
-    # Make long format, clean the factors
-    rob.long = data.frame(condition = rep(colnames(rob), each = nrow(rob)),
-                          measurement = unlist(rob))
-    rownames(rob.long) = NULL
-    rob.long$condition = gsub("_"," ",rob.long$condition)
-    rob.long$condition = gsub("-"," ",rob.long$condition)
-    rob.long$condition = gsub("\\."," ",rob.long$condition)
-    rob.long$measurement = as.factor(rob.long$measurement)
-    rob.long$measurement = factor(rob.long$measurement, levels(rob.long$measurement)[c(3,1,4,2)])
-    
-    rob.plot = ggplot(data = rob.long) +
-      geom_bar(mapping = aes(x = condition, fill = measurement), width = 0.7,
-               position = "fill", color = "black") +
-      coord_flip(ylim = c(0, 1)) +
-      guides(fill = guide_legend(reverse = TRUE)) +
-      scale_fill_manual("Risk of Bias",
-                        labels = c("  Unclear risk of bias  ",
-                                   "  High risk of bias   ",
-                                   "  Low risk of bias  ",
-                                   "  Missing information  "),
-                        values = c(Unclear = "#D9C032",
-                                   High = "#A61B40",
-                                   Low = "#1589b0",
-                                   Missing = "white")) +
-      scale_y_continuous(labels = scales::percent) +
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            axis.ticks.y = element_blank(),
-            axis.text.y = element_text(size = 28, color = "black"),
-            axis.line.x = element_line(colour = "black", size = 0.5, linetype = "solid"),
-            legend.position = "bottom",
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            panel.background = element_blank(),
-            legend.background = element_rect(linetype = "solid", colour = "black"),
-            legend.title = element_blank(),
-            legend.key.size = unit(0.75, "cm"),
-            legend.text = element_text(size = 16))
-    
-    plot(rob.plot)
-    
-    if (table == TRUE){
-      plot(rob.table)
-    }
-    
-  }
-  
-}
-
 
 # Cairo can be used to produce high quality images in svg format
 library(Cairo)
@@ -409,7 +112,7 @@ forest.meta(x = pub_meta,
             colgap.forest = "0.5cm",
             spacing=1.1,
             leftcols = c("studlab", "effect", "n", "ci"),
-            leftlabs = c("Study", "Proportion", "n", "95% CI"),
+            leftlabs = c("Study", "Proportion", "Sample \nsize", "95% CI"),
             smlab= "Cases per 100 observations",
             just= "center",
             rightcols = FALSE,
@@ -430,12 +133,12 @@ forest.meta(x = pub_meta,
 dev.off()}
   
 #########################################################################
-###                   Meta-analyses for MAC and MABs
+###                  Figure 4 - Meta-analyses for MAC and MABs
 #########################################################################
 
 #-------------------- Meta-analysis for MABs infection
 {tiff(filename = "Fig4a.tiff",
-      width = 220,
+      width = 230,
       height = 110,
       units = "mm",
       pointsize = 10, # size of text
@@ -459,7 +162,7 @@ pub_data %>%
               colgap.forest = "0.5cm",
               spacing = 1.1,
               leftcols = c("studlab", "effect", "n", "ci"),
-              leftlabs = c("Study", "Proportion", "n", "95% CI"),
+              leftlabs = c("Study", "Proportion", "Sample \nsize", "95% CI"),
               smlab= "Cases per 100 observations",
               just = "center",
               rightcols = FALSE,
@@ -481,7 +184,7 @@ dev.off()}
 
 #-------------------- Meta-analysis for MAC infection
 {tiff(filename = "Fig4b.tiff",
-      width = 220,
+      width = 230,
       height = 110,
       units = "mm",
       pointsize = 10, # size of text
@@ -505,7 +208,7 @@ pub_data %>%
               colgap.forest = "0.5cm",
               spacing = 1.1,
               leftcols = c("studlab", "effect", "n", "ci"),
-              leftlabs = c("Study", "Proportion", "n", "95% CI"),
+              leftlabs = c("Study", "Proportion", "Sample \nsize", "95% CI"),
               smlab= "Cases per 100 observations",
               just = "center",
               rightcols = FALSE,
@@ -529,30 +232,94 @@ dev.off()}
 ###                   Supplementary figures
 #########################################################################
 
+### ------------ Supplementary figure 1 - Traffic plots
 
-### ------------ Funnel plot at 300 dpi using Cairo
-
-{tiff(filename = "FigS4.tiff",
-     width = 120,
-     height = 110,
-     units = "mm",
-     pointsize = 10, # size of text
-     res = 300, # desired dpi
-     type = "cairo", # specify use of Cairo
-     compression = "lzw" # to reduce size
+# incidence plot
+{tiff(filename = "FigS1a.tiff",
+      width = 150,
+      height = 90,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
 )
-funnel(x = metafor.full,
-       yaxis = "ni",
-       xlab="Logit transformed proportions",
-       level = 95,
-       atransf = transf.ilogit,
-       col = "darkblue")
+plot<-   rob_data2 %>% 
+    filter(incidence_ind=="yes") %>% 
+    select(-ROB_overall) %>% 
+    rob.summary(table = T,
+                studies=.$study) %>% 
+    delete_layers(idx = 1:3) +
+    geom_tile(color = "black", fill = "white", size = 0.7) +
+    geom_point(aes(color=as.factor(measurement)),
+               size=13, 
+               shape=15) +
+  scale_y_discrete(position = "right", ) +
+  geom_text(aes(label = measurement),
+            size = 6) +
+  theme(axis.text.x = element_text(size=11,
+                                     angle = 45,
+                                     face = "bold"),
+          axis.text.y = element_text(size=13))
+print(plot)  
 dev.off()}
 
-### ------------ Boxplots plot at 300 dpi using Cairo
+# ntm disease plot
+{tiff(filename = "FigS1b.tiff",
+      width = 150,
+      height = 180,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
+)
+  plot<-   rob_data2 %>%
+    filter(period_disease_ind =="yes" | point_disease_ind=="yes") %>% 
+    # reverse the order of study levels so when flipped it looks okay
+    mutate(study=reorder(study, desc(study))) %>% 
+    select(-ROB_overall) %>% 
+    rob.summary(table = T,
+                studies=.$study) %>% 
+    delete_layers(idx = 1:3) +
+    geom_tile(color = "black",
+              fill = "white", 
+              size = 0.7) +
+    geom_point(aes(color=as.factor(measurement)),
+               size=12,
+               shape=15) +
+    geom_text(aes(label = measurement),
+              size = 7) +
+    scale_y_discrete(position = "right", ) +
+    theme(axis.text.x = element_text(size=11, 
+                                     angle = 45,
+                                     face = "bold"),
+          axis.text.y = element_text(size=13))
+  print(plot)  
+  dev.off()}
 
-tiff(filename = "FigS5.tiff",
-      width = 140,
+### ------------ Supplementary figure 2 - Subgroup analyses
+
+## Subgroup: study design (registry or not) 
+{tiff(filename = "FigS2a.tiff",
+      width = 240,
+      height = 90,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
+)
+  update.meta(meta.full,
+              subgroup = is_registry,
+              subgroup.name = "registry",
+              tau.common = F) %>% 
+    forest_wrapper()
+  dev.off()}
+
+## Subgroup: year of data collection
+{tiff(filename = "FigS2b.tiff",
+      width = 240,
       height = 100,
       units = "mm",
       pointsize = 10, # size of text
@@ -560,76 +327,46 @@ tiff(filename = "FigS5.tiff",
       type = "cairo", # specify use of Cairo
       compression = "lzw" # to reduce size
 )
-temp$period_infection %>% 
-  ggplot(data = .,
-         aes(y = estimate,
-             x = study_length_cat,
-             color = study_length_cat)) +
-    # three categories of length looks better
-    geom_boxplot(outlier.shape = NA, width = 0.5) +
-    geom_jitter(aes(color = study_length_cat),
-                width = 0.1) +
-    theme_classic() +
-    theme(legend.position = "none",
-          axis.title = element_text(size = 12)) +
-    scale_y_continuous(breaks = seq(0, 40, 5)) +
-    labs(x = "\nStudy length in years ",
-         y = "Prevalence estimate (%)\n")
-dev.off()
+  update.meta(meta.full,
+              subgroup = before_year,
+              tau.common = F) %>%
+    forest_wrapper(data = .,
+                   pred_int = T,
+                   xlim = c(0, 0.5),
+                   subgroup.name = "First year of data collection")
+  
+  dev.off()}
 
-### ------------ Plot of tendency estimates for each registry 
-
-tiff(filename = "FigS6.tiff",
-     width = 160,
-     height = 120,
-     units = "mm",
-     pointsize = 10, # size of text
-     res = 300, # desired dpi
-     type = "cairo", # specify use of Cairo
-     compression = "lzw" # to reduce size
+## Subgroup: regions (continents)
+{tiff(filename = "FigS2c.tiff",
+      width = 240,
+      height = 100,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
 )
-clean_data %>% 
-  # select registries
-  filter(point_infection_ind == "yes" & is_registry=="Registry") %>%
-  # produce percentage estimate for all registry reports
-  mutate(estimate = case_when(is.na(point_inf_perc) ~ 
-                                (ntm_point_infection / sample_size_cf ) * 100,
-                              TRUE ~ point_inf_perc)) %>%
-  ## clean the names of registries for graph 
-  mutate(used_registry=str_replace(used_registry, "US", "USA CF registry"),
-         used_registry=str_replace(used_registry, "ECFS", "European CF registry"),
-         used_registry=str_replace(used_registry, "Brazil", "Brazilian CF registry"),
-         used_registry=str_replace(used_registry, "Canada", "Canadian CF registry"),
-         used_registry=str_replace(used_registry, "Australia", "Australian CF registry")
-         ) %>% 
-  ggplot(aes(x = first_year_data,
-             y = estimate,
-             group = used_registry,
-             color = used_registry)) +
-  geom_point() +
-  facet_wrap(~ used_registry) +
-  scale_x_continuous(breaks = seq(2010, 2019, 2)) +
-  labs (y = "Annual prevalence estimate (%)",
-        x = "Year") +
-  theme_bw() +
-  theme(legend.position = "none",
-        strip.text.x = element_text(size = 12),
-        axis.title.y = element_text(size = 13))
-dev.off()
-
+  update.meta(meta.full,
+              subgroup =  region1, 
+              tau.common = F) %>% 
+    forest_wrapper(data = .,
+                   subgroup.name = "Region",
+                   xlim = c(0, 0.5)) 
+  dev.off()}
 
 ### ------------ Supplementary figure 3
 
 ### Subgroup analysis by region of MABs meta-analysis
 
 {tiff(filename = "FigS3a.tiff",
-     width = 240,
-     height = 80,
-     units = "mm",
-     pointsize = 10, # size of text
-     res = 300, # desired dpi
-     type = "cairo", # specify use of Cairo
-     compression = "lzw" # to reduce size
+      width = 240,
+      height = 80,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
 )
   inf_point_data %>% 
     filter(!is.na(mabs_infection)) %>% 
@@ -680,6 +417,103 @@ dev.off()
     forest_wrapper()
   dev.off()}
 
+### ------------ Supplementary figure 4 - Funnel plot 
+
+{tiff(filename = "FigS4.tiff",
+     width = 140,
+     height = 110,
+     units = "mm",
+     pointsize = 10, # size of text
+     res = 300, # desired dpi
+     type = "cairo", # specify use of Cairo
+     compression = "lzw" # to reduce size
+)
+funnel(x = metafor.full,
+       yaxis = "ni",
+       xlab="Logit transformed proportions",
+       level = 95,
+       atransf = transf.ilogit,
+       col = "darkblue")
+dev.off()}
+
+### ------------ Supplementary Figure 4 - Boxplots of period prevalence
+
+tiff(filename = "FigS5.tiff",
+      width = 140,
+      height = 100,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
+      )
+temp$period_infection %>% 
+  ggplot(data = .,
+         aes(y = estimate,
+             x = study_length_cat,
+             color = study_length_cat)) +
+    # three categories of length looks better
+    geom_boxplot(outlier.shape = NA, width = 0.5) +
+    geom_jitter(aes(color = study_length_cat),
+                width = 0.1) +
+    theme_classic() +
+    theme(legend.position = "none",
+          axis.title = element_text(size = 12)) +
+    scale_y_continuous(breaks = seq(0, 40, 5)) +
+    labs(x = "\nStudy length in years ",
+         y = "Prevalence estimate (%)\n")
+dev.off()
+
+### ------------ Supplementary figure 6 - Tendencies in registry
+
+tiff(filename = "FigS6.tiff",
+     width = 160,
+     height = 120,
+     units = "mm",
+     pointsize = 10, # size of text
+     res = 300, # desired dpi
+     type = "cairo", # specify use of Cairo
+     compression = "lzw" # to reduce size
+)
+clean_data %>% 
+  # select registries
+  filter(point_infection_ind == "yes" & is_registry=="Registry") %>%
+  # percentages and calculated prevalence
+  mutate(estimate = case_when(is.na(point_inf_perc) ~ 
+                                (ntm_point_infection / sample_size_cf ) * 100,
+                              TRUE ~ point_inf_perc)) %>% 
+  ggplot(aes(x = first_year_data,
+             y = estimate,
+             group = used_registry,
+             color = used_registry)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(2010, 2019, 2)) +
+  labs (y = "Annual prevalence estimate (%)",
+        x = "Year",
+        color = "") +
+  theme_classic() +
+  theme(panel.grid.major.x = element_line(color = "gray70",size = 0.25),
+        panel.grid.major.y = element_line(color = "gray70",size = 0.25))
+dev.off()
+
+
+#########################################################################
+####       Meta-regression table
+#########################################################################
+
+summary(metareg) %>%
+  coef() %>%
+  mutate(Coefs = temp$coef.names, .before = 1,
+         zval = NULL) %>%
+  # specify names of columns
+  flextable_wrapper(names_col = c("Coefficients",  "LOGIT-estimate", "Std. error",
+                                  "p.value", "CI-lower", "CI-upper"),
+                    digits = 3) %>% 
+  bold(i= ~ p.value <0.05 & Coefficients!="Intercept", part = "body") %>% 
+  print(., preview = "docx")
+
+
 #########################################################################
 ####       Concatenate pictures using the command line
 #########################################################################
@@ -693,13 +527,11 @@ dev.off()
 # ------------- concatenate vertically
 # convert -append img1 img2
 
-summary(metareg) %>%
-  coef() %>%
-  mutate(Coefs = temp$coef.names, .before = 1,
-         zval = NULL) %>%
-  # specify names of columns
-  flextable_wrapper(names_col = c("Coefficients",  "LOGIT-estimate", "Std. error",
-                                  "p.value", "CI-lower", "CI-upper"),
-                    digits = 3) %>% 
-  bold(i= ~ p.value <0.05 & Coefficients!="Intercept", part = "body") %>% 
-  print(., preview = "docx")
+# ------------- add white space for labels on the left
+convert img.tiff -compress lzw  -gravity east \
+    -extent 4600x3542 img_edited.tiff
+# extent uses pixels of image so check before adding a number
+
+
+
+
