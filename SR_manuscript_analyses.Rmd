@@ -20,24 +20,25 @@ knitr::opts_chunk$set(echo = TRUE, eval=T)
 
 # Introduction
 
-Our systematic review is a comprehensive picture of all studies and registry reports that include prevalence/incidence of _nontuberculous mycobacteria (NTM) in cystic fibrosis_ population
+Our systematic review is a comprehensive picture of all studies and registry reports that include prevalence/incidence of *nontuberculous mycobacteria (NTM) in cystic fibrosis* population
 
-The analysis will be performed in R (v4.1.1) with __Github__ version control repository.We will analyze the prevalence as a proportion and the incidence as a rate/proportion. The data from the study cohort is saved in the `input` directory as a `.csv` file. 
+The analysis will be performed in R (v4.1.1) with **Github** version control repository.We will analyze the prevalence as a proportion and the incidence as a rate/proportion. The data from the study cohort is saved in the `input` directory as a `.csv` file.
 
 ## Aims
-1. Produce ready to analyze data
-2. Explore and summarize the data
-3. Analyze all epidemiological measures of interest and perform meta-analysis if possible
-4. When possible, perform subgroup, meta-regression and sensitivity analyses
-5. Evaluate risk of bias and publication bias
+
+1.  Produce ready to analyze data
+2.  Explore and summarize the data
+3.  Analyze all epidemiological measures of interest and perform meta-analysis if possible
+4.  When possible, perform subgroup, meta-regression and sensitivity analyses
+5.  Evaluate risk of bias and publication bias
 
 # Data wrangling
 
 Load required packages
 
-- `dmetar` includes helpful functions
-- `meta` and `metafor` used for meta-analysis, funnel plots, forest plots and meta-regression
-- `flextable` creates nicely formatted tables
+-   `dmetar` includes helpful functions
+-   `meta` and `metafor` used for meta-analysis, funnel plots, forest plots and meta-regression
+-   `flextable` creates nicely formatted tables
 
 ```{r, warning=FALSE, message=FALSE}
 # devtools::install_github("MathiasHarrer/dmetar")
@@ -48,7 +49,7 @@ lapply(packages, library, character.only=T)
 
 ## Data import and wrangling
 
-**Make sure to use updated dataset.** 
+**Make sure to use updated data set.**
 
 ```{r, message=FALSE}
 temp <-  list()
@@ -69,12 +70,12 @@ temp$untidy_data <-
          study = stringr::str_to_title(study))
 ```
 
-Create new variables to 
+Create new variables to
 
-- Re-code study design under three categories.
-- Specify studies that used registry data 
-- Indicate registry reports vs non-registry reports
-- Categorize studies according by sample size 
+-   Re-code study design under three categories.
+-   Specify studies that used registry data
+-   Indicate registry reports vs non-registry reports
+-   Categorize studies according by sample size
 
 ```{r wrangle study type}
 table(temp$untidy_data$study_design)
@@ -113,7 +114,7 @@ temp$untidy_data<-
 count(temp$untidy_data, before_year) 
 ```
 
-The variable `region` has few studies in AUS, ME, AFR & LAC. We group these in the _others_ category. 
+The variable `region` has few studies in AUS, ME, AFR & LAC. We group these in the *others* category.
 
 ```{r regions}
 # table(temp$untidy_data$region)
@@ -133,8 +134,8 @@ count(temp$untidy_data, region1)
 
 Risk of bias plots require a special structure of the data.frame
 
-- We standardize the Joanna Briggs appraisal tool for prevalence studies answers to follow COCHRANE coding `Yes=Low, No=High, Unclear=Unclear`
-- Name of variables is explicit
+-   We standardize the Joanna Briggs appraisal tool for prevalence studies answers to follow COCHRANE coding `Yes=Low, No=High, Unclear=Unclear`
+-   Name of variables is explicit
 
 ```{r}
 temp$untidy_data <- 
@@ -152,11 +153,11 @@ temp$untidy_data <-
 
 We created the following definitions based on the author's considerations of the most important domains in quality appraisal:
 
-+ **Low risk requires _low risk_ in all of ** sampling frame, sampling scheme, sample size, population description and statistical calculation. Also, _must not be high risk_ in standardized outcome measurement.
+-   **Low risk requires *low risk* in all of** sampling frame, sampling scheme, sample size, population description and statistical calculation. Also, *must not be high risk* in standardized outcome measurement.
 
-+ **High risk requires _high risk_ in any of **  sampling frame, sampling scheme, sampling size,  population description, identification methods or statistical calculation
+-   **High risk requires *high risk* in any of** sampling frame, sampling scheme, sampling size, population description, identification methods or statistical calculation
 
-+ **Unclear** for remaining ones
+-   **Unclear** for remaining ones
 
 ```{r}
 # save names of QA variables
@@ -181,7 +182,7 @@ temp$untidy_data <-
   rename_with(.cols = matches("^Q"), ~ temp$ROBcolnames) 
 ```
 
-The last step in data wrangling is to change all character variables into factors. 
+The last step in data wrangling is to change all character variables into factors.
 
 ```{r}
 clean_data <-  
@@ -193,9 +194,9 @@ clean_data <-
 
 ### Wrapper: proportions and tables
 
-+ __count_table__ counts and produces a kable formatted table 
-+ __flextable_wrapper__ contains the styling steps to produce an html formatted table, requires a data input 
-+ __count_prop__ produces counts and proportions, no kable
+-   **count_table** counts and produces a kable formatted table
+-   **flextable_wrapper** contains the styling steps to produce an html formatted table, requires a data input
+-   **count_prop** produces counts and proportions, no kable
 
 ```{r kable wrapper}
 
@@ -259,17 +260,16 @@ flextable_wrapper <- function(data,
 
 ```
 
+### Wrapper: meta-analysis
 
-### Wrapper: meta-analysis 
+**metaprop_formatted** wraps the `meta::metaprop` function with options
 
-__metaprop_formatted__ wraps the `meta::metaprop` function with options 
-
-- `sm=PLOGIT`, logit transformation for the proportions
-- `hakn=TRUE` applies an adjustment for more conservative confidence intervals
-- `comb.random=T`, random effects model
-- `method="GLMM"` recommended over inverse variance for proportions
-- `n=sample_size_cf` specifies the variable with sample size
-- `event=all_ntm_infection` specified number of events
+-   `sm=PLOGIT`, logit transformation for the proportions
+-   `hakn=TRUE` applies an adjustment for more conservative confidence intervals
+-   `comb.random=T`, random effects model
+-   `method="GLMM"` recommended over inverse variance for proportions
+-   `n=sample_size_cf` specifies the variable with sample size
+-   `event=all_ntm_infection` specified number of events
 
 ```{r formatted meta.prop function}
 metaprop_formatted <- function (data = data, fixed = F,
@@ -295,17 +295,18 @@ metaprop_formatted <- function (data = data, fixed = F,
 
 ```
 
-### Wrapper: forest plot 
-__forest_wrapper__ produces a forest plot with common formatting options. 
+### Wrapper: forest plot
 
-- `sortvar=data$TE,` specifies the sorting variable, default is the weight in the MA
-- `predict=T` calculates prediction intervals instead of CI by default
-- `comb.fixed = F` translates to random effects MA
-- `print.I2.ci = T` forces printing of heterogeneity confidence intervals
-- `study.results` determines if individual study results should be plotted, it does not by default
-- `layout="RevMan5"` formats output according to RevMan5 style 
-- `xlim` determines X-axis limit
-- `addrow.overall=T` adds empty row below estimates 
+**forest_wrapper** produces a forest plot with common formatting options.
+
+-   `sortvar=data$TE,` specifies the sorting variable, default is the weight in the MA
+-   `predict=T` calculates prediction intervals instead of CI by default
+-   `comb.fixed = F` translates to random effects MA
+-   `print.I2.ci = T` forces printing of heterogeneity confidence intervals
+-   `study.results` determines if individual study results should be plotted, it does not by default
+-   `layout="RevMan5"` formats output according to RevMan5 style
+-   `xlim` determines X-axis limit
+-   `addrow.overall=T` adds empty row below estimates
 
 ```{r formatted forest.meta }
 
@@ -342,18 +343,21 @@ forest_wrapper <- function(data,
 
 ```
 
-# Exploratory data analysis 
+# Exploratory data analysis
 
 ## By outcomes reported
 
-The dataset includes only raw numbers, percentages without raw numbers were not included. 
+The dataset includes only raw numbers, percentages without raw numbers were not included.
 
-- **NTM disease** period prevalence = 13 
-- **NTM disease** point prevalence = 2
+-   **NTM disease** period prevalence = 13
 
-- **NTM infection** only period prevalence = 43
-- **NTM infection** point/annual prevalence = 67
-- **NTM infection** incidence proportion = 5
+-   **NTM disease** point prevalence = 2
+
+-   **NTM infection** only period prevalence = 43
+
+-   **NTM infection** point/annual prevalence = 67
+
+-   **NTM infection** incidence proportion = 5
 
 ```{r}
 
@@ -404,7 +408,7 @@ count_prop(clean_data, region1)
 clean_data  %>% count_table(age_group)
 ```
 
-## By years of data collection 
+## By years of data collection
 
 ```{r}
 clean_data$before_year<- factor(clean_data$before_year, 
@@ -503,12 +507,12 @@ clean_data %>%
 
 ## Meta-analysis: all studies
 
-* Meta-analysis will be conducted only for point prevalence of NTM infection
-    - `all_ntm_infection` contains the number of events
-    - `sample_size_cf` is the total CF population
-* The dataset for this section is a subset of studies to include in meta-analysis
-    - Excludes studies that used registry data to avoid duplication
-    - Uses only last available registry report of every region to avoid over-representation
+-   Meta-analysis will be conducted only for point prevalence of NTM infection
+    -   `all_ntm_infection` contains the number of events
+    -   `sample_size_cf` is the total CF population
+-   The dataset for this section is a subset of studies to include in meta-analysis
+    -   Excludes studies that used registry data to avoid duplication
+    -   Uses only last available registry report of every region to avoid over-representation
 
 ```{r}
 inf_point_data <-  
@@ -524,14 +528,14 @@ inf_point_data <-
   
 ```
 
-The results are heterogeneous in nature. 
+The results are heterogeneous in nature.
 
 ```{r}
 meta.full<- metaprop_formatted(inf_point_data)
 forest_wrapper(meta.full)
 ```
 
-## Subgroup: study design (registry or not) 
+## Subgroup: study design (registry or not)
 
 To produce subgroups we update `full.meta` according to a variable and then pass it to our `forest_wrapper` function to produce nicely formatted forest plots
 
@@ -567,11 +571,11 @@ inf_point_data %>%
 
 ```
 
-Registries are only available in the last period, but they do not significantly impact the results. 
+Registries are only available in the last period, but they do not significantly impact the results.
 
 ## Subgroup: regions (continents)
 
-Others includes studies in Latin-America, Australia, Middle-East and Africa. 
+Others includes studies in Latin-America, Australia, Middle-East and Africa.
 
 ```{r}
 update.meta(meta.full,
@@ -583,23 +587,21 @@ update.meta(meta.full,
     
 ```
 
-There is a significant difference in the effect estimates among the groups, but heterogeneity remains high in all (>95%)
+There is a significant difference in the effect estimates among the groups, but heterogeneity remains high in all (\>95%)
 
-**Subgroup: age**  was not performed because most studies (> 80%) had mixed (pediatric + adult) populations.  
+**Subgroup: age** was not performed because most studies (\> 80%) had mixed (pediatric + adult) populations.
 
 ```{r}
 count_prop(inf_point_data, age_group)
 ```
 
-
 # Additional analyses
 
-## Pre-specified: Meta-regression 
+## Pre-specified: Meta-regression
 
-We use `metafor::rma.uni` function to fit the meta-analyses and indicate the moderators (grouping variables) to be used. 
+We use `metafor::rma.uni` function to fit the meta-analyses and indicate the moderators (grouping variables) to be used.
 
-1. Prepare the variables levels for evaluation in meta-regression. 
-
+1.  Prepare the variables levels for evaluation in meta-regression.
 
 ```{r calculate proportion effect size}
 # change reference level in factors
@@ -612,9 +614,9 @@ inf_point_data <-
          age_group =  factor(age_group, levels = c("mixed", "pediatric", "adult")))
 ```
 
-2. We will use Logit transformation (`PLO`) to optimize the properties of the generalized linear model as recommended by __(Schwarzer 2019)__
-    * Beforehand, we verify concordance between `meta` and `metafor` packages
-    * Model with all pre-specified predictors failed to converge, the best prediction was obtained using sample size `(size_cat)`. Other covariates are included as pre-specified.
+2.  We will use Logit transformation (`PLO`) to optimize the properties of the generalized linear model as recommended by **(Schwarzer 2019)**
+    -   Beforehand, we verify concordance between `meta` and `metafor` packages
+    -   Model with all pre-specified predictors failed to converge, the best prediction was obtained using sample size `(size_cat)`. Other covariates are included as pre-specified.
 
 ```{r metafor review and metaregression}
 metafor.full <- 
@@ -661,7 +663,7 @@ metareg_glmm_wrapper(covs=~ study_design + size_cat + region1 + before_year)
 
 ```
 
-Finally, we produce a table of the model coefficients and calculate the change in NTM infection prevalence under different conditions. 
+Finally, we produce a table of the model coefficients and calculate the change in NTM infection prevalence under different conditions.
 
 ```{r}
 # create vector with formatted names for coefficients
@@ -721,7 +723,6 @@ inf_point_data %>%
   forest_wrapper(xlim = c(0, 0.2))
 
 ```
-
 
 ## Pre-specified MAC infection prevalence
 
@@ -815,9 +816,17 @@ clean_data %>%
   group_by(is_registry) %>% 
   count_prop(testing_freq)
 
-#------------------------- sensitivity analysis without preece2016
+#------------------------- sensitivity analysis without Preece 2016 sutdy
 inf_point_data %>% 
   filter(!str_detect(id, "preece")) %>% 
+  metaprop_formatted() %>% 
+  forest_wrapper()
+
+colnames(inf_point_data_all)
+
+#------------------------- sensitivity analysis without Campos-Herrero 2016 study
+inf_point_data %>% 
+  filter(!str_detect(id, "campos")) %>% 
   metaprop_formatted() %>% 
   forest_wrapper()
 
@@ -851,10 +860,8 @@ clean_data %>%
 # Infection period prevalence
 
 ## Exploratory analyses
-We will summarize:
-* number of studies reporting period prevalence
-* regions were they come from
-* length of study period
+
+We will summarize: \* number of studies reporting period prevalence \* regions were they come from \* length of study period
 
 ```{r}
 count(clean_data, 
@@ -875,14 +882,13 @@ temp$period_infection <-
          estimate = round(estimate, 2)) %>%
   # categories of study length
   mutate(study_length_cat = case_when((last_year_data - first_year_data) < 2 ~
-                                        "Less than 2",
-                                      (last_year_data - first_year_data) >= 2 &
-                                        (last_year_data - first_year_data) < 5 ~ 
-                                        "2 to 4",
+                                        ">1 to 2",
+                                      (last_year_data - first_year_data) >= 2 & (last_year_data - first_year_data) < 5 ~ ">2 to 4",
                                       TRUE ~ "5 or more"),
          # make study length a factor
          study_length_cat = factor(study_length_cat,
-                                   levels = c("Less than 2", "2 to 4",
+                                   levels = c(">1 to 2",
+                                              ">2 to 4",
                                               "5 or more"))
   )
 
@@ -967,7 +973,7 @@ ggplot(data = temp$period_infection,
 
 ```
 
-# NTM disease outcomes 
+# NTM disease outcomes
 
 ```{r}
 temp$period_disease <-
@@ -994,12 +1000,11 @@ clean_data %>%
 
 ```
 
-
 # Publication bias and Risk of bias assessment
 
 ## Funnel plots
 
-For the meta-analysis of all studies, we see some asymmetry in the funnel plot `~ sample size`. However, no appropriate test for publication bias is available for prevalence meta-analysis. The asymmetry is due to the reports from the US. 
+For the meta-analysis of all studies, we see some asymmetry in the funnel plot `~ sample size`. However, no appropriate test for publication bias is available for prevalence meta-analysis. The asymmetry is due to the reports from the US.
 
 ```{r}
 
@@ -1018,9 +1023,9 @@ metabias(meta.full, method.bias = "peters")
 
 We will summarize the Quality assessment recorded from the Joanna Briggs tool. Unfortunately, there is no easy way to plot this in R and we have to create a new dataframe that fulfills the requirements of the available tools:
 
-- First column for study labels named `study`
-- Then, columns with risk of bias appraisal coded as Low/Unclear/High/Missing
-- Overall quality in last column
+-   First column for study labels named `study`
+-   Then, columns with risk of bias appraisal coded as Low/Unclear/High/Missing
+-   Overall quality in last column
 
 ```{r load robvis library, message=F}
 # must be latest development version
@@ -1137,8 +1142,8 @@ with(rob_data,
 
 ## Traffic: registry studies
 
-* With `delete_layers()`, we remove automatically generated layers
-* Then, we add the table tiles, color squares and text to produce the traffic light
+-   With `delete_layers()`, we remove automatically generated layers
+-   Then, we add the table tiles, color squares and text to produce the traffic light
 
 ```{r}
 
@@ -1226,6 +1231,7 @@ rob_data %>%
 # Sensitivity analyses using midpoint registries
 
 ## Midpoint registry only
+
 ```{r}
 
 # overall result
@@ -1269,4 +1275,3 @@ inf_point_data %>%
 ```{r}
 sessionInfo()
 ```
-

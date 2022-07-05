@@ -522,14 +522,14 @@ summary(metareg) %>%
 # brew install imagemagick
 
 # ------------- concatenate horizontally
-# convert +append img1 img2
+      convert -compress lzw +append img1 img2
 
 # ------------- concatenate vertically
-# convert -append img1 img2
+      convert -compress lzw -append img1 img2
 
 # ------------- add white space for labels on the left
-convert img.tiff -compress lzw  -gravity east \
-    -extent 4600x3542 img_edited.tiff
+      convert img.tiff -compress lzw  -gravity east \
+              -extent 4600x3542 img_edited.tiff
 # extent uses pixels of image so check before adding a number
 
 
