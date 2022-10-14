@@ -81,7 +81,8 @@ pub_data <-
          study=str_replace(study, "Ecfs", "European CF registry"),
          study=str_replace(study, "Brazil", "Brazilian CF registry"),
          study=str_replace(study, "Canada", "Canadian CF registry"),
-         study=str_replace(study, "Australia", "Australian CF registry")
+         study=str_replace(study, "Australia", "Australian CF registry"),
+         study=str_replace(study, "2003b", "2003")
   )
 
   
@@ -420,23 +421,126 @@ dev.off()}
 ### ------------ Supplementary figure 4 - Funnel plot 
 
 {tiff(filename = "FigS4.tiff",
-     width = 140,
-     height = 110,
-     units = "mm",
-     pointsize = 10, # size of text
-     res = 300, # desired dpi
-     type = "cairo", # specify use of Cairo
-     compression = "lzw" # to reduce size
+      width = 140,
+      height = 110,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
 )
-funnel(x = metafor.full,
-       yaxis = "ni",
-       xlab="Logit transformed proportions",
-       level = 95,
-       atransf = transf.ilogit,
-       col = "darkblue")
-dev.off()}
+  funnel(x = metafor.full,
+         yaxis = "ni",
+         xlab="Logit transformed proportions",
+         level = 95,
+         atransf = transf.ilogit,
+         col = "darkblue")
+  dev.off()}
 
-### ------------ Supplementary Figure 4 - Boxplots of period prevalence
+### ------------ Supplementary figure 5a - Only registry sensitivity analysis
+
+
+{tiff(filename = "FigS7a.tiff",
+      width = 220,
+      height = 80,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
+)
+  pub_data %>% 
+    # select point_infection or annual_period studies
+    filter(point_infection_ind == "yes" | annual_period_ind =="yes") %>% 
+    # drop_na
+    drop_na(ntm_point_infection) %>% 
+    # drop studies that used registry data (duplicate the data)
+    filter(is_registry=="Registry" & used_registry !="no") %>% 
+    # include only last registry report per country
+    filter(last.registry_analysis=="yes") %>% 
+    metaprop_formatted() %>% 
+    forest.meta(x = .,
+                prediction = T,
+                comb.fixed = F,
+                layout = "meta",
+                print.tau2 = F,
+                print.pval.Q = F,
+                print.I2 = T,
+                print.I2.ci = T,
+                colgap.left = "0cm",
+                colgap.forest = "0.5cm",
+                spacing = 1.1,
+                leftcols = c("studlab", "effect", "n", "ci"),
+                leftlabs = c("Study", "Proportion", "Sample \nsize", "95% CI"),
+                smlab= "Cases per 100 observations",
+                just = "center",
+                rightcols = FALSE,
+                study.results = T,
+                pscale = 100,
+                addrow = T,
+                addrow.overall = T,
+                col.by = "grey2",
+                xlim = c(0, 80),
+                addrows.below.overall = 1,
+                col.square = "darkblue",
+                col.diamond = "lightblue",
+                col.random = "darkblue",
+                digits = 1,
+                fontsize = 14,
+                fs.heading = 16,
+                fs.random = 16)
+  dev.off()}
+
+### ------------ Supplementary figure 5b - Sensitivity without RGM/BCSA culture media
+
+{tiff(filename = "FigS7b.tiff",
+      width = 220,
+      height = 130,
+      units = "mm",
+      pointsize = 10, # size of text
+      res = 300, # desired dpi
+      type = "cairo", # specify use of Cairo
+      compression = "lzw" # to reduce size
+)
+  
+  inf_point_data %>% 
+    filter(!str_detect(id, "preece|scohy|raidt|plongla")) %>% 
+    metaprop_formatted() %>% 
+    forest.meta(x = .,
+                prediction = T,
+                comb.fixed = F,
+                layout = "meta",
+                print.tau2 = F,
+                print.pval.Q = F,
+                print.I2 = T,
+                print.I2.ci = T,
+                colgap.left = "0cm",
+                colgap.forest = "0.5cm",
+                spacing = 1.1,
+                leftcols = c("studlab", "effect", "n", "ci"),
+                leftlabs = c("Study", "Proportion", "Sample \nsize", "95% CI"),
+                smlab= "Cases per 100 observations",
+                just = "center",
+                rightcols = FALSE,
+                study.results = T,
+                pscale = 100,
+                addrow = T,
+                addrow.overall = T,
+                col.by = "grey2",
+                xlim = c(0, 70),
+                addrows.below.overall = 1,
+                col.square = "darkblue",
+                col.diamond = "lightblue",
+                col.random = "darkblue",
+                digits = 1,
+                fontsize = 14,
+                fs.heading = 16,
+                fs.random = 16)
+  dev.off()}
+
+
+
+### ------------ Supplementary Figure 6 - Boxplots of period prevalence
 
 tiff(filename = "FigS5.tiff",
       width = 140,
@@ -464,7 +568,7 @@ temp$period_infection %>%
          y = "Prevalence estimate (%)\n")
 dev.off()
 
-### ------------ Supplementary figure 6 - Tendencies in registry
+### ------------ Supplementary figure 7 - Tendencies in registry
 
 tiff(filename = "FigS6.tiff",
      width = 160,
@@ -498,6 +602,8 @@ clean_data %>%
 dev.off()
 
 
+
+
 #########################################################################
 ####       Meta-regression table
 #########################################################################
@@ -522,10 +628,10 @@ summary(metareg) %>%
 # brew install imagemagick
 
 # ------------- concatenate horizontally
-      convert -compress lzw +append img1 img2
+      convert -compress lzw +append img1 img2 new_image
 
 # ------------- concatenate vertically
-      convert -compress lzw -append img1 img2
+      convert -compress lzw -append img1 img2 new_image
 
 # ------------- add white space for labels on the left
       convert img.tiff -compress lzw  -gravity east \

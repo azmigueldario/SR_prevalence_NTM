@@ -690,11 +690,11 @@ summary(metareg) %>%
 
 # --------- estimates calculation
 # baseline
-transf.ilogit(-2.888)
+transf.ilogit(-2.884)  %>%  round(., 3)
 # sample size < 1000
-transf.ilogit(-2.888 + 1.693)
+transf.ilogit(-2.884 + 1.671) %>%  round(., 3)
 # other regions
-transf.ilogit(-2.888 - 1.3)
+transf.ilogit(-2.884 - 1.302)  %>%  round(., 3)
 
 ```
 
@@ -815,12 +815,6 @@ inf_point_data_all %>% # all studies
 clean_data %>%
   group_by(is_registry) %>% 
   count_prop(testing_freq)
-
-#------------------------- sensitivity analysis without Preece 2016 sutdy
-inf_point_data %>% 
-  filter(!str_detect(id, "preece")) %>% 
-  metaprop_formatted() %>% 
-  forest_wrapper()
 
 colnames(inf_point_data_all)
 
@@ -1270,6 +1264,50 @@ inf_point_data %>%
   metareg_glmm_wrapper(data = .,
                        covs=~ study_design + size_cat + region1 + before_year) 
 
+```
+
+## Using only registry data to evaluate duplication
+
+```{r}
+ 
+  clean_data %>% 
+  # select point_infection or annual_period studies
+  filter(point_infection_ind == "yes" | annual_period_ind =="yes") %>% 
+  # drop_na
+  drop_na(ntm_point_infection) %>% 
+  # drop studies that used registry data (duplicate the data)
+  filter(is_registry=="Registry" & used_registry !="no") %>% 
+  # include only last registry report per country
+  filter(last.registry_analysis=="yes") %>% 
+  metaprop_formatted() %>% 
+  forest_wrapper(stu.res = T)
+  
+```
+
+## Sensitivity analysis, only studies using MGIT or LG culture media
+
+```{r}
+
+# what studies use other culture media
+inf_point_data %>% 
+  select(study, culture_method) %>% 
+  view()
+
+# summarized forest plot for this sensitivity analysis
+inf_point_data %>% 
+    filter(!str_detect(id, "preece|scohy|raidt|plongla")) %>% 
+    metaprop_formatted() %>% 
+    forest.meta(x = .)
+```
+
+## Sensitivity, excluding Preece 2016 due to nonstandard sampling
+
+```{r}
+
+inf_point_data %>% 
+  filter(!str_detect(id, "preece")) %>% 
+  metaprop_formatted() %>% 
+  forest_wrapper()
 ```
 
 ```{r}
