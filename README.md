@@ -11,7 +11,9 @@ The repository includes:
 - Analytical code to produce all results included in the manuscript
 - Analytical code to produce publication plots
 
-Produced by 
+An alternative source of the published data is available through Dryad (datasets) at https://doi.org/doi:10.5061/dryad.tdz08kq30 and Zenodo (scripts) at  https://doi.org/10.5281/zenodo.7255648.
+
+Produced by:
 
 Miguel D. Prieto
 M.D., MSc. 
